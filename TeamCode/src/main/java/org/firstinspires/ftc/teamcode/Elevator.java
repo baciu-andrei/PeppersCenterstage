@@ -7,46 +7,67 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.teamcode.IStateBasedModule;
+
 import java.util.ArrayList;
 
-public class Elevator implements IRobotModule{
+public class Elevator implements IStateBasedModule {
 
     DcMotorEx ll;
     DcMotorEx lr;
+
     Gamepad gamepad1, gamepad2;
-    static int low = 100, mid = 200, high = 300, ground = 0, target;
+    static int groundPos = 0, level = 0, incrementPos = 50, firstLevelPos = 20, transferPos = 40;
 
-    public enum State{
-        LOW(low),
-        MID(mid),
-        HIGH(high),
-        GROUND(ground),
-        GOING_LOW(low),
-        GOING_MID(mid),
-        GOING_HIGH(high),
-        GOING_GROUND(ground);
 
-        public int pos;
 
-        State(int pos) {
-            this.pos = pos;
+    /*TODO
+     *  updateState() reseting,next State
+     *  updateHardware() , reset motor power , pid motoare
+     *  update la final
+     *  write in gamepad
+     *  */
+    enum State{
+        DOWN(groundPos), GOING_DOWN(groundPos, DOWN),
+        UP(groundPos + firstLevelPos +level* incrementPos), GOING_UP(groundPos + firstLevelPos +level* incrementPos, UP),
+        TRANSFER(transferPos), GOING_TRANSFER(transferPos, TRANSFER),
+        RESETING(groundPos, DOWN);
+
+        public int position;
+        public final State nextState;
+        State(int position){
+            this.position = position;
+            this.nextState = this;
         }
-
-        public static void update(){
-            LOW.pos = low;
-            MID.pos = mid;
-            HIGH.pos = high;
-            GROUND.pos = ground;
-            GOING_GROUND.pos = ground;
+        State(int position, State nextState)
+        {
+            this.position = position;
+            this.nextState = nextState;
         }
     }
-    public State state, previousState;
-    public Elevator(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2)
+    State state;
+
+    public void setState(State newState){
+        if(state == newState)
+            return;
+        else
+            this.state = newState;
+
+    }
+    public void updateStateValues(){
+        State.DOWN.position = groundPos;
+        State.GOING_DOWN.position = groundPos;
+        State.UP.position = groundPos + firstLevelPos + incrementPos*level;
+        State.GOING_UP.position = groundPos + firstLevelPos + incrementPos*level;
+        State.TRANSFER.position = transferPos + groundPos;
+        State.GOING_TRANSFER.position = transferPos + groundPos;
+    }
+    public Elevator(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, State initialState)
     {
-        init(hm,gamepad1,gamepad2);
+        init(hm,gamepad1,gamepad2,initialState);
     }
 
-    public void init(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2)
+    public void init(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, State initialState)
     {
         ll = hm.get(DcMotorEx.class, "ll");
         lr = hm.get(DcMotorEx.class, "lr");
@@ -69,15 +90,28 @@ public class Elevator implements IRobotModule{
 
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
+        this.state = initialState;
+    }
+    public void update(){
+        updateStateValues();
+        updateState();
+        updateHardware();
+    }
+    @Override
+    public void updateState() {
+        if(this.state == State.RESETING)
+        {
+            //RESET CODE IDK
+        }
+        else
+        {
+
+        }
     }
 
     @Override
-    public void atStart() {
+    public void updateHardware() {
 
     }
 
-    @Override
-    public void loop() {
-        State.update();
-    }
 }

@@ -7,9 +7,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.teamcode.IStateBasedModule;
+
 import java.util.ArrayList;
 
-public class DriveTrain implements IRobotModule{
+public class DriveTrain {
+
     DcMotorEx mfl;
     DcMotorEx mfr;
     DcMotorEx mbl;
@@ -97,12 +100,6 @@ public class DriveTrain implements IRobotModule{
 
     }
 
-    @Override
-    public void atStart() {
-
-    }
-
-    @Override
     public void loop() {
         double forward = -gamepad1.left_stick_y;
         double right = gamepad1.left_stick_x;
