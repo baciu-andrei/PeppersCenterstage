@@ -10,6 +10,32 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import org.firstinspires.ftc.teamcode.IStateBasedModule;
 
 import java.util.ArrayList;
+   
+public static class DriveParameters{
+    public double forward, right , turn;
+
+    public DriveParameters(double forward, double right, double turn) {
+        this.forward = forward;
+        this.right = right;
+        this.turn = turn;
+    }
+
+    void normalize(){
+        double denominator = Math.abs(forward) + Math.abs(right) + Math.abs(turn);
+        denominator = Math.max(1, denominator);
+
+        forward /= denominator;
+        right /= denominator;
+        turn /= denominator;
+    }
+
+    void setMultiplier(double multiplier){
+        forward *= multiplier;
+        right *= multiplier;
+        turn *= multiplier;
+    }
+
+}
 
 public class DriveTrain {
 
@@ -18,23 +44,22 @@ public class DriveTrain {
     DcMotorEx mbl;
     DcMotorEx mbr;
     Gamepad gamepad1, gamepad2;
+
     public enum SPEED{
         SLOW(0.5),
         FAST(1);
         public final double multiplier;
 
-        SPEED(double multiplier) {
-            this.multiplier = multiplier;
+        SPEED(double multiplier_param) {
+            multiplier = multiplier_param;
         }
-    }
+    } // pare destul de sus
+
     public SPEED speed = SPEED.FAST;
+
     public DriveTrain (HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2)
     {
-        init(hm,gamepad1,gamepad2);
-    }
-
-    public void init(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2){
-        mfl = hm.get(DcMotorEx.class, "mfl");
+		mfl = hm.get(DcMotorEx.class, "mfl");
         mfr = hm.get(DcMotorEx.class, "mfr");
         mbl = hm.get(DcMotorEx.class, "mbl");
         mbr = hm.get(DcMotorEx.class, "mbr");
@@ -44,9 +69,7 @@ public class DriveTrain {
 //        mbl.setDirection(DcMotorSimple.Direction.REVERSE);
         mbr.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        ArrayList<DcMotorEx> motorListDrive = new ArrayList<>();
-        motorListDrive.add(mfl);motorListDrive.add(mfr);
-        motorListDrive.add(mbl);motorListDrive.add(mbr);
+        ArrayList<DcMotorEx> motorListDrive = new ArrayList<>(mfl, mfr, mbl, mbr); //suna a o idee nice de a fi global definita
 
         for(DcMotorEx motor: motorListDrive){
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -57,34 +80,9 @@ public class DriveTrain {
 
         }
 
-        this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
     }
 
-    public static class DriveParameters{
-        public double forward, right , turn;
 
-        public DriveParameters(double forward, double right, double turn) {
-            this.forward = forward;
-            this.right = right;
-            this.turn = turn;
-        }
-
-        void normalize(){
-            double denominator = Math.abs(forward) + Math.abs(right) + Math.abs(turn);
-            denominator = Math.max(1, denominator);
-            forward /= denominator;
-            right /= denominator;
-            turn /= denominator;
-        }
-
-        void setMultiplier(double multiplier){
-            forward *= multiplier;
-            right *= multiplier;
-            turn *= multiplier;
-        }
-
-    }
     public DriveParameters getDriveParameters  (double forward , double right , double turn){
         DriveParameters driveParameters = new DriveParameters(forward,right,turn);
         driveParameters.setMultiplier(speed.multiplier);

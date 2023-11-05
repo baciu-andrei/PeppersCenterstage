@@ -64,20 +64,13 @@ public class Elevator implements IStateBasedModule {
     }
     public Elevator(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, State initialState)
     {
-        init(hm,gamepad1,gamepad2,initialState);
-    }
-
-    public void init(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, State initialState)
-    {
         ll = hm.get(DcMotorEx.class, "ll");
         lr = hm.get(DcMotorEx.class, "lr");
 
         ll.setDirection(DcMotorSimple.Direction.REVERSE);
         lr.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        ArrayList<DcMotorEx> motorListElevator = new ArrayList<>();
-        motorListElevator.add(ll);
-        motorListElevator.add(lr);
+        ArrayList<DcMotorEx> motorListElevator = new ArrayList<>(ll, lr);
 
         for(DcMotorEx motorElevator : motorListElevator){
             motorElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -91,12 +84,15 @@ public class Elevator implements IStateBasedModule {
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
         this.state = initialState;
+ 
     }
+
     public void update(){
         updateStateValues();
         updateState();
         updateHardware();
     }
+
     @Override
     public void updateState() {
         if(this.state == State.RESETING)
