@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Fastpixel;
 
-import com.qualcomm.ftccommon.FtcWifiDirectChannelSelectorActivity;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -13,30 +15,40 @@ import java.util.concurrent.TimeUnit;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "trashTeleOp")
+@Config
 
-public class mergi extends LinearOpMode {
+public class Mergi extends LinearOpMode {
 
+    FtcDashboard dash = FtcDashboard.getInstance();
+    public static double clawAngleStorage = 0.62, clawAngleScoring = 1;
+    public static double clawClosingPos = 0.85, clawOpeningPos = 0.69;
+    public static double intakeSpeed = 0.6;
+    public static double clawRotation0DegreesOuttake = 0.5, clawRotation45DegreesOuttake = 0, clawRotation90DegreesOuttake = 0;
+    public static double clawVirtualStorage = 0.08, clawVirtualScoring = 0.75;
+    public static boolean isLeftClosed = false, isRightClosed = false , isClawAngleAtStorage = true;
+    public static boolean wasG2YPreviouslyPressed = false, wasSharePreviouslyPressed = false, wasOptionsPreviouslyPressed = false, wasYPrevoiuslyPressed = false, wasLeftBumperPreviouslyPressed = false, wasRightBumperPreviouslyPressed = false, wasDpadRightPreviouslyPressed = false, wasDpadLeftPreviouslyPressed = false, wasBPreviouslyPressed = false;
+    public static boolean isReadyToScore = false, isPasstroughUp = false;
+    public static int level = 0, increment = 40, firstpos = 600, ground = 0, passthroughPos = 100;
+    public static boolean goingToTargetPos = false, scoringPosition = false;
+    public static boolean enabledIntake = false;
+    public static int liftConfig = 0;
+    public static boolean wasRightStickButtonPressed = false;
+    public static boolean wasDpadUpPreviouslyPressed = false, wasDpadDownPreviouslyPressed = false, wasXPreviouslyPressed = false, wasAPreviouslyPressed = false;
     @Override
     public void runOpMode() throws InterruptedException {
 
+        telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
         DriveTrain driveTrain;
-        driveTrain = new DriveTrain(hardwareMap , gamepad1 , gamepad2);
+        driveTrain = new DriveTrain(hardwareMap , gamepad1 , gamepad2 , telemetry);
 
         OpClaw claw;
-        double clawClosingPos = 0.6, clawOpeningPos = 0.5;
-        double clawRotation0DegreesOuttake = 0.3, clawRotation45DegreesOuttake = 0.45, clawRotation90DegreesOuttake = 0.6;
-        double clawVirtualStorage = 0.4, clawVirtualScoring = 0.6;
-        boolean isLeftClosed = false, isRightClosed = false, isVirtualInScoringPos = false;
-        claw = new OpClaw(hardwareMap, clawOpeningPos, clawRotation0DegreesOuttake, clawVirtualStorage);
-        boolean wasSharePreviouslyPressed = false, wasOptionsPreviouslyPressed = false, wasYPrevoiuslyPressed = false, wasLeftBumperPreviouslyPressed = false, wasRightBumperPreviouslyPressed = false, wasDpadRightPreviouslyPressed = false, wasDpadLeftPreviouslyPressed = false, wasBPreviouslyPressed = false;
-        boolean isReadyToScore = false, isPasstroughUp = false;
 
-        lift elevator = new lift(hardwareMap);
-        int level = 0, increment = 40, firstpos = 70, ground = 0, passthroughPos = 100;
-        boolean goingToTargetPos = false, scoringPosition = false;
+        claw = new OpClaw(hardwareMap, clawOpeningPos, clawRotation0DegreesOuttake, clawVirtualStorage, clawAngleStorage);
+
+        Lift elevator = new Lift(hardwareMap);
 
         DcMotorEx intake = hardwareMap.get(DcMotorEx.class, "intake");
-        boolean enabledIntake = false;
+
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake.setPower(0);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -44,7 +56,6 @@ public class mergi extends LinearOpMode {
 
         ElapsedTime timer = new ElapsedTime();
 
-        boolean wasDpadUpPreviouslyPressed = false, wasDpadDownPreviouslyPressed = false, wasXPreviouslyPressed = false, wasAPreviouslyPressed = false;
 
         timer.time(TimeUnit.MILLISECONDS);
 
@@ -52,6 +63,8 @@ public class mergi extends LinearOpMode {
 
         while(opModeIsActive() && !isStopRequested()) {
             driveTrain.loop();
+            if(gamepad1.b)
+                elevator.setTarget(liftConfig);
 
             //lift lmao
             if(gamepad1.dpad_up && !wasDpadUpPreviouslyPressed)
@@ -69,23 +82,31 @@ public class mergi extends LinearOpMode {
                     goingToTargetPos = true;
                     timer.reset();
                 }
-                else if(goingToTargetPos == true && timer.milliseconds() >= 1000)
-                {
-                    if(scoringPosition == true)
-                    {
-                        elevator.setTarget(ground + firstpos + level*increment);
-                        goingToTargetPos = false;
-                        scoringPosition = false;
-                    }
-                    if(scoringPosition == false)
-                    {
-                        elevator.setTarget(ground);
-                        goingToTargetPos = false;
-                    }
-
-                }
             }
             wasXPreviouslyPressed = gamepad1.x;
+            if(goingToTargetPos == true && timer.milliseconds() >= 1000)
+            {
+                if(scoringPosition == true)
+                {
+                    elevator.setTarget(passthroughPos);
+                    goingToTargetPos = false;
+                    scoringPosition = false;
+                }
+                else
+
+                {
+
+                    elevator.setTarget((ground + firstpos + level*increment));
+                    goingToTargetPos = false;
+                    scoringPosition = true;
+                }
+
+            }
+            if(gamepad2.y && !wasG2YPreviouslyPressed)
+            {
+                elevator.setTarget(firstpos);
+            }
+            wasG2YPreviouslyPressed = gamepad2.y;
 
             if(gamepad1.options && !wasOptionsPreviouslyPressed)
             {
@@ -101,13 +122,13 @@ public class mergi extends LinearOpMode {
             }
             wasOptionsPreviouslyPressed = gamepad1.options;
 
-            if(gamepad1.share && !wasSharePreviouslyPressed)
+            if(gamepad2.a && !wasSharePreviouslyPressed)
             {
                 if(isReadyToScore)
                 {
                     claw.virtual(clawVirtualStorage);
                     isReadyToScore = false;
-                    scoringPosition = true;
+
                 }
                 else
                 {
@@ -116,13 +137,13 @@ public class mergi extends LinearOpMode {
                 }
 
             }
-            wasSharePreviouslyPressed = gamepad1.share;
+            wasSharePreviouslyPressed = gamepad2.a;
             //intake
             if(gamepad1.a && !wasAPreviouslyPressed)
             {
                 if(enabledIntake == false)
                 {
-                    intake.setPower(1);
+                    intake.setPower(intakeSpeed);
                     enabledIntake = true;
                 }
                 else
@@ -135,7 +156,23 @@ public class mergi extends LinearOpMode {
 
             //claw
 
+            if(gamepad2.b && !wasRightStickButtonPressed)
+            {
+                if(isClawAngleAtStorage == true)
+                {
+                    claw.setAng(clawAngleScoring);
+                    isClawAngleAtStorage = false;
+                }
+                else
+                {
+                    claw.setAng(clawAngleStorage);
+                    isClawAngleAtStorage = true;
+                }
+            }
+            wasRightStickButtonPressed = gamepad2.b;
+
             //rotate
+
             if(gamepad1.y && !wasYPrevoiuslyPressed)
             {
                 claw.rotateOuttake(clawRotation0DegreesOuttake);
@@ -182,7 +219,18 @@ public class mergi extends LinearOpMode {
             }
             wasRightBumperPreviouslyPressed = gamepad1.right_bumper;
 
-
+            telemetry.addData("intakeSpeed", intakeSpeed);
+            telemetry.addData("groundT",ground);
+            telemetry.addData("passthroughPosT",passthroughPos);
+            telemetry.addData("levelT",level);
+            telemetry.addData("clesteSt/spateT",isLeftClosed);
+            telemetry.addData("clesteDr/fataT",isRightClosed);
+            telemetry.addData("isReadyToScoreT",isReadyToScore);
+            telemetry.addData("isPasstroughUpT",isPasstroughUp);
+            telemetry.addData("goingToTargetPosT",goingToTargetPos);
+            telemetry.addData("scoringPositionT",scoringPosition);
+            telemetry.addData("isClawAngleAtStorage", isClawAngleAtStorage);
+            telemetry.update();
         }
     }
 }

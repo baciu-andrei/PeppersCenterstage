@@ -10,7 +10,7 @@ public class OpMode extends LinearOpMode {
     DriveTrain driveTrain;
 
     public void initialize(){
-        driveTrain = new DriveTrain(hardwareMap , gamepad1 , gamepad2);
+        driveTrain = new DriveTrain(hardwareMap , gamepad1 , gamepad2 , telemetry);
     }
 
     @Override

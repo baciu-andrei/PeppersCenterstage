@@ -1,12 +1,20 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.IStateBasedModule;
 
 import java.util.ArrayList;
@@ -18,6 +26,8 @@ public class DriveTrain {
     DcMotorEx mbl;
     DcMotorEx mbr;
     Gamepad gamepad1, gamepad2;
+    Telemetry tele;
+    IMU imu;
     public enum SPEED{
         SLOW(0.5),
         FAST(1);
@@ -28,12 +38,12 @@ public class DriveTrain {
         }
     }
     public SPEED speed = SPEED.FAST;
-    public DriveTrain (HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2)
+    public DriveTrain (HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, Telemetry tele)
     {
-        init(hm,gamepad1,gamepad2);
+        init(hm,gamepad1,gamepad2,tele);
     }
 
-    public void init(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2){
+    public void init(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, Telemetry tele){
         mfl = hm.get(DcMotorEx.class, "mfl");
         mfr = hm.get(DcMotorEx.class, "mfr");
         mbl = hm.get(DcMotorEx.class, "mbl");
@@ -59,6 +69,25 @@ public class DriveTrain {
 
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
+        this.tele = tele;
+        imu = hm.get(IMU.class,"imuControl");
+
+        IMU.Parameters myIMUParameters;
+
+        myIMUParameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        new Orientation(
+                                AxesReference.INTRINSIC,
+                                AxesOrder.ZYX,
+                                AngleUnit.DEGREES,
+                                90,
+                                38.4f,
+                                90,
+                                0 // acquisitionTime , not used
+                        )
+                )
+        );
+        imu.initialize(myIMUParameters);
     }
 
     public static class DriveParameters{
@@ -105,6 +134,12 @@ public class DriveTrain {
         double right = gamepad1.left_stick_x;
         double turn = gamepad1.right_trigger - gamepad1.left_trigger;
         driveForValues(getDriveParameters(forward, right, turn));
+
+        YawPitchRollAngles robotOrientation;
+        robotOrientation = imu.getRobotYawPitchRollAngles();
+
+        double Yaw = robotOrientation.getYaw(AngleUnit.DEGREES);
+        tele.addData("headin: ", Yaw);
 
     }
 }
