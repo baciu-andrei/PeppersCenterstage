@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.DriveTrain;
+import org.firstinspires.ftc.teamcode.parts.DriveTrain;
 
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +39,7 @@ public class Mergi extends LinearOpMode {
 
         telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
         DriveTrain driveTrain;
-        driveTrain = new DriveTrain(hardwareMap , gamepad1 , gamepad2 , telemetry);
+        driveTrain = new DriveTrain(hardwareMap , gamepad1 , gamepad2);
 
         OpClaw claw;
 
@@ -62,7 +62,7 @@ public class Mergi extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive() && !isStopRequested()) {
-            driveTrain.loop();
+            driveTrain.run();
             if(gamepad1.b)
                 elevator.setTarget(liftConfig);
 

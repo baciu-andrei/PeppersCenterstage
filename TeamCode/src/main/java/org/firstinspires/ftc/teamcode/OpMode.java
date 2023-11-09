@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.DriveTrain;
+import org.firstinspires.ftc.teamcode.parts.DriveTrain;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "mifu lol")
 public class OpMode extends LinearOpMode {
@@ -10,7 +10,7 @@ public class OpMode extends LinearOpMode {
     DriveTrain driveTrain;
 
     public void initialize(){
-        driveTrain = new DriveTrain(hardwareMap , gamepad1 , gamepad2 , telemetry);
+        driveTrain = new DriveTrain(hardwareMap , gamepad1 , gamepad2);
     }
 
     @Override
@@ -20,7 +20,8 @@ public class OpMode extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive() && !isStopRequested()) {
-            driveTrain.loop();
+
+            driveTrain.run();
 
         }
     }

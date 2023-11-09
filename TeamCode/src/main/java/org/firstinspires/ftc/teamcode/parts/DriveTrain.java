@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.parts;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,35 +18,36 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.IStateBasedModule;
 
 import java.util.ArrayList;
-   
-public static class DriveParameters{
-    public double forward, right , turn;
+import java.util.Collection;
 
-    public DriveParameters(double forward, double right, double turn) {
-        this.forward = forward;
-        this.right = right;
-        this.turn = turn;
+
+
+public class DriveTrain extends Thread{
+    public static class DriveParameters{
+        public double forward, right , turn;
+
+        public DriveParameters(double forward, double right, double turn) {
+            this.forward = forward;
+            this.right = right;
+            this.turn = turn;
+        }
+
+        void normalize(){
+            double denominator = Math.abs(forward) + Math.abs(right) + Math.abs(turn);
+            denominator = Math.max(1, denominator);
+
+            forward /= denominator;
+            right /= denominator;
+            turn /= denominator;
+        }
+
+        void setMultiplier(double multiplier){
+            forward *= multiplier;
+            right *= multiplier;
+            turn *= multiplier;
+        }
+
     }
-
-    void normalize(){
-        double denominator = Math.abs(forward) + Math.abs(right) + Math.abs(turn);
-        denominator = Math.max(1, denominator);
-
-        forward /= denominator;
-        right /= denominator;
-        turn /= denominator;
-    }
-
-    void setMultiplier(double multiplier){
-        forward *= multiplier;
-        right *= multiplier;
-        turn *= multiplier;
-    }
-
-}
-
-public class DriveTrain {
-
     DcMotorEx mfl;
     DcMotorEx mfr;
     DcMotorEx mbl;
@@ -79,7 +80,11 @@ public class DriveTrain {
 //        mbl.setDirection(DcMotorSimple.Direction.REVERSE);
         mbr.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        ArrayList<DcMotorEx> motorListDrive = new ArrayList<>(mfl, mfr, mbl, mbr); //suna a o idee nice de a fi global definita
+        ArrayList<DcMotorEx> motorListDrive = new ArrayList<>(); //suna a o idee nice de a fi global definita
+        motorListDrive.add(mfl);
+        motorListDrive.add(mfr);
+        motorListDrive.add(mbl);
+        motorListDrive.add(mbr);
 
         for(DcMotorEx motor: motorListDrive){
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -129,7 +134,7 @@ public class DriveTrain {
 
     }
 
-    public void loop() {
+    public void run() {
         double forward = -gamepad1.left_stick_y;
         double right = gamepad1.left_stick_x;
         double turn = gamepad1.right_trigger - gamepad1.left_trigger;
