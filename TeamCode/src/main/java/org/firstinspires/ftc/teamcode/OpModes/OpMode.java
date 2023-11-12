@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.components.Elevator;
 import org.firstinspires.ftc.teamcode.parts.DriveTrain;
+import org.firstinspires.ftc.teamcode.parts.Intake;
 import org.firstinspires.ftc.teamcode.parts.OutTake;
 
 @Config
@@ -15,6 +16,7 @@ public class OpMode extends LinearOpMode {
 
     DriveTrain driveTrain;
     OutTake outTake;
+    Intake intake;
 
     FtcDashboard dash;
     public void initialize(){
@@ -22,6 +24,7 @@ public class OpMode extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
         driveTrain = new DriveTrain(hardwareMap, gamepad1, gamepad2, telemetry);
         outTake = new OutTake(hardwareMap, gamepad1, gamepad2, telemetry);
+        intake = new Intake(hardwareMap, gamepad1, gamepad2);
     }
 
     @Override
@@ -33,6 +36,7 @@ public class OpMode extends LinearOpMode {
         while(opModeIsActive() && !isStopRequested()) {
             driveTrain.run();
             outTake.loop();
+            intake.loop();
         }
     }
 }
