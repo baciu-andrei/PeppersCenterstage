@@ -1,6 +1,6 @@
 ## CONTROLLER 1
 
-A - getter/placer           -- schimba de pe modul adu pixelii pe modu pune pixelii
+A - outtake                 -- activate outtake
 B - lift pt gripper         -- ala de te spanzura
 X - launch drone            -- lanseaza drona
 Y - catch                   -- activeaza/dezactiveaza ambele claw-uri deodata
@@ -16,7 +16,7 @@ LTRIGGER - rotate robot     -- roteste botu spre stanga
 
 A - activate/deactivate intake -- da power on/off la intake
 B - rotate 180              -- roteste storage-ul cu pixeli 180 de grade (da swap)
-X - rotate 90               -- roteste storage-ul cu pixeli 90 grade spre stanga
+X - fedding
 Y - rotate -90              -- roteste storage-ul cu pixeli 90 grade spre drapta
 
 RSTICK -

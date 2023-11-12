@@ -22,7 +22,8 @@ import java.util.Collection;
 
 
 
-public class DriveTrain extends Thread{
+
+public class DriveTrain{
     public static class DriveParameters{
         public double forward, right , turn;
 
@@ -67,8 +68,9 @@ public class DriveTrain extends Thread{
     } // pare destul de sus
 
     public SPEED speed = SPEED.FAST;
+    public static boolean WORKING = true;
 
-    public DriveTrain (HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2)
+    public DriveTrain (HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, Telemetry tel)
     {
 		mfl = hm.get(DcMotorEx.class, "mfl");
         mfr = hm.get(DcMotorEx.class, "mfr");
@@ -97,7 +99,6 @@ public class DriveTrain extends Thread{
 
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
-        this.tele = tele;
         imu = hm.get(IMU.class,"imuControl");
 
         IMU.Parameters myIMUParameters;
@@ -116,6 +117,7 @@ public class DriveTrain extends Thread{
                 )
         );
         imu.initialize(myIMUParameters);
+        tele = tel;
     }
 
 
@@ -135,6 +137,7 @@ public class DriveTrain extends Thread{
     }
 
     public void run() {
+        if(!WORKING) return;
         double forward = -gamepad1.left_stick_y;
         double right = gamepad1.left_stick_x;
         double turn = gamepad1.right_trigger - gamepad1.left_trigger;
