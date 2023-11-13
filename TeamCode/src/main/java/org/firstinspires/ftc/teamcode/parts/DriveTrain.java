@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.parts;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,14 +18,43 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.IStateBasedModule;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
-public class DriveTrain {
 
+
+
+public class DriveTrain{
+    public static class DriveParameters{
+        public double forward, right , turn;
+
+        public DriveParameters(double forward, double right, double turn) {
+            this.forward = forward;
+            this.right = right;
+            this.turn = turn;
+        }
+
+        void normalize(){
+            double denominator = Math.abs(forward) + Math.abs(right) + Math.abs(turn);
+            denominator = Math.max(1, denominator);
+
+            forward /= denominator;
+            right /= denominator;
+            turn /= denominator;
+        }
+
+        void setMultiplier(double multiplier){
+            forward *= multiplier;
+            right *= multiplier;
+            turn *= multiplier;
+        }
+
+    }
     DcMotorEx mfl;
     DcMotorEx mfr;
     DcMotorEx mbl;
     DcMotorEx mbr;
     Gamepad gamepad1, gamepad2;
+
     Telemetry tele;
     IMU imu;
     public enum SPEED{
@@ -33,18 +62,17 @@ public class DriveTrain {
         FAST(1);
         public final double multiplier;
 
-        SPEED(double multiplier) {
-            this.multiplier = multiplier;
+        SPEED(double multiplier_param) {
+            multiplier = multiplier_param;
         }
-    }
-    public SPEED speed = SPEED.FAST;
-    public DriveTrain (HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, Telemetry tele)
-    {
-        init(hm,gamepad1,gamepad2,tele);
-    }
+    } // pare destul de sus
 
-    public void init(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, Telemetry tele){
-        mfl = hm.get(DcMotorEx.class, "mfl");
+    public SPEED speed = SPEED.FAST;
+    public static boolean WORKING = true;
+
+    public DriveTrain (HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, Telemetry tel)
+    {
+		mfl = hm.get(DcMotorEx.class, "mfl");
         mfr = hm.get(DcMotorEx.class, "mfr");
         mbl = hm.get(DcMotorEx.class, "mbl");
         mbr = hm.get(DcMotorEx.class, "mbr");
@@ -54,9 +82,11 @@ public class DriveTrain {
 //        mbl.setDirection(DcMotorSimple.Direction.REVERSE);
         mbr.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        ArrayList<DcMotorEx> motorListDrive = new ArrayList<>();
-        motorListDrive.add(mfl);motorListDrive.add(mfr);
-        motorListDrive.add(mbl);motorListDrive.add(mbr);
+        ArrayList<DcMotorEx> motorListDrive = new ArrayList<>(); //suna a o idee nice de a fi global definita
+        motorListDrive.add(mfl);
+        motorListDrive.add(mfr);
+        motorListDrive.add(mbl);
+        motorListDrive.add(mbr);
 
         for(DcMotorEx motor: motorListDrive){
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -69,7 +99,6 @@ public class DriveTrain {
 
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
-        this.tele = tele;
         imu = hm.get(IMU.class,"imuControl");
 
         IMU.Parameters myIMUParameters;
@@ -88,32 +117,10 @@ public class DriveTrain {
                 )
         );
         imu.initialize(myIMUParameters);
+        tele = tel;
     }
 
-    public static class DriveParameters{
-        public double forward, right , turn;
 
-        public DriveParameters(double forward, double right, double turn) {
-            this.forward = forward;
-            this.right = right;
-            this.turn = turn;
-        }
-
-        void normalize(){
-            double denominator = Math.abs(forward) + Math.abs(right) + Math.abs(turn);
-            denominator = Math.max(1, denominator);
-            forward /= denominator;
-            right /= denominator;
-            turn /= denominator;
-        }
-
-        void setMultiplier(double multiplier){
-            forward *= multiplier;
-            right *= multiplier;
-            turn *= multiplier;
-        }
-
-    }
     public DriveParameters getDriveParameters  (double forward , double right , double turn){
         DriveParameters driveParameters = new DriveParameters(forward,right,turn);
         driveParameters.setMultiplier(speed.multiplier);
@@ -129,7 +136,8 @@ public class DriveTrain {
 
     }
 
-    public void loop() {
+    public void run() {
+        if(!WORKING) return;
         double forward = -gamepad1.left_stick_y;
         double right = gamepad1.left_stick_x;
         double turn = gamepad1.right_trigger - gamepad1.left_trigger;
