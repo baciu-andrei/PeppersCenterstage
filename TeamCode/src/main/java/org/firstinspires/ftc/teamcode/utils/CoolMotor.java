@@ -23,6 +23,9 @@ public class CoolMotor {
 
     public CoolMotor(DcMotorEx motor, RunMode runMode, boolean reversed){
         this.motor = motor;
+
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
         motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
         motor.setMotorType(motorConfigurationType);

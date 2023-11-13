@@ -30,10 +30,11 @@ public class OutTake {
     }
 
     public void loop(){
-        if(gamepad1.a){ activateDropper = !activateDropper; }
+        if(gamepad2.a){ activateDropper = !activateDropper; }
         elevator.loop();
         brat.loop(activateDropper);
 
+        gamepad2.update();
         gamepad1.update();
     }
 }

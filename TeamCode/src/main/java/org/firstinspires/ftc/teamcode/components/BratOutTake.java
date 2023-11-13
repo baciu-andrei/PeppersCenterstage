@@ -30,19 +30,20 @@ public class BratOutTake {
 
         rotate2.setDirection(Servo.Direction.FORWARD);
         rotate1.setDirection(Servo.Direction.REVERSE);
-        align_backdrop.setDirection(Servo.Direction.FORWARD);
 
-        claw1.setDirection(Servo.Direction.REVERSE);
+        align_backdrop.setDirection(Servo.Direction.REVERSE);
+
+//        claw1.setDirection(Servo.Direction.REVERSE);
 //        claw2.setDirection(Servo.Direction.REVERSE);
 
-        rotate2.setPosition(0);
+
         rotate1.setPosition(0);
+        rotate2.setPosition(0);
 
         align_backdrop.setPosition(0);
 
         claw1.setPosition(0);
 //        claw2.setPosition(0);
-//        rotate_all = hm.get(Servo.class, "align_backdrop");
 //        swap_pixels = hm.get(Servo.class, "swap_pixels");
 
 
