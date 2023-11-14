@@ -20,13 +20,14 @@ import java.util.concurrent.TimeUnit;
 public class Mergi extends LinearOpMode {
 
     FtcDashboard dash = FtcDashboard.getInstance();
+    public static double intakeServoDown = 0.2, intakeServoUp = 0.8;
     public static double clawAngleStorage = 0.62, clawAngleScoring = 1;
     public static double clawClosingPos = 0.85, clawOpeningPos = 0.69;
     public static double intakeSpeed = 0.6;
     public static double clawRotation0DegreesOuttake = 0.5, clawRotation45DegreesOuttake = 0, clawRotation90DegreesOuttake = 0;
     public static double clawVirtualStorage = 0.08, clawVirtualScoring = 0.75;
     public static boolean isLeftClosed = false, isRightClosed = false , isClawAngleAtStorage = true;
-    public static boolean wasG2YPreviouslyPressed = false, wasSharePreviouslyPressed = false, wasOptionsPreviouslyPressed = false, wasYPrevoiuslyPressed = false, wasLeftBumperPreviouslyPressed = false, wasRightBumperPreviouslyPressed = false, wasDpadRightPreviouslyPressed = false, wasDpadLeftPreviouslyPressed = false, wasBPreviouslyPressed = false;
+    public static boolean wasG2YPreviouslyPressed = false, wasSharePreviouslyPressed = false, wasOptionsPreviouslyPressed = false, wasYPrevoiuslyPressed = false, wasLeftBumperPreviouslyPressed = false, wasLeftBumper2PreviouslyPressed = false, wasRightBumper2PreviouslyPressed = false, wasRightBumperPreviouslyPressed = false, wasDpadRightPreviouslyPressed = false, wasDpadLeftPreviouslyPressed = false, wasBPreviouslyPressed = false;
     public static boolean isReadyToScore = false, isPasstroughUp = false;
     public static int level = 0, increment = 40, firstpos = 600, ground = 0, passthroughPos = 100;
     public static boolean goingToTargetPos = false, scoringPosition = false;
@@ -40,6 +41,8 @@ public class Mergi extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
         DriveTrain driveTrain;
         driveTrain = new DriveTrain(hardwareMap , gamepad1 , gamepad2 , telemetry);
+
+        IntakeServo intakeServo = new IntakeServo(hardwareMap , intakeServoUp);
 
         OpClaw claw;
 
@@ -154,6 +157,18 @@ public class Mergi extends LinearOpMode {
             }
             wasAPreviouslyPressed = gamepad1.a;
 
+            if(gamepad2.left_bumper && wasLeftBumper2PreviouslyPressed)
+            {
+                intakeServo.setIntakeServo(intakeServoDown);
+            }
+            wasLeftBumper2PreviouslyPressed = gamepad2.left_bumper;
+
+            if(gamepad2.right_bumper && wasRightBumper2PreviouslyPressed)
+            {
+                intakeServo.setIntakeServo(intakeServoUp);
+            }
+            wasRightBumper2PreviouslyPressed = gamepad2.right_bumper;
+
             //claw
 
             if(gamepad2.b && !wasRightStickButtonPressed)
@@ -218,6 +233,7 @@ public class Mergi extends LinearOpMode {
                 }
             }
             wasRightBumperPreviouslyPressed = gamepad1.right_bumper;
+
 
             telemetry.addData("intakeSpeed", intakeSpeed);
             telemetry.addData("groundT",ground);
