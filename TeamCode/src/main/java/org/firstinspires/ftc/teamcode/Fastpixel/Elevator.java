@@ -11,12 +11,13 @@ import org.firstinspires.ftc.teamcode.Utils.StickyGamepads;
 
 public class Elevator{
 
-    final private CoolMotor left, right;
+//    final private CoolMotor left, right;
+    final private DcMotorEx left, right;
     StickyGamepads gamepad1, gamepad2;
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.01,0.1,0.001);
-
-    public static double ff1 = 0.1, ff2 = 0.00009;
-    final private double fullExtend = (int)(180*4/Math.sin(Math.PI/3));
+//    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.01,0.1,0.001);
+//
+//    public static double ff1 = 0.1, ff2 = 0.00009;
+    final private double fullExtend = 950;
     private int lift_level;
     public int gotoPos;
     final private double CPR = 103.8, diametruSpool = 32, oneStep = fullExtend/11;
@@ -24,8 +25,26 @@ public class Elevator{
     Telemetry telemetry;
 
     public Elevator(HardwareMap hardwareMap, Gamepad g1, Gamepad g2, Telemetry tel){
-        left  = new CoolMotor(hardwareMap.get(DcMotorEx.class, "ll"), CoolMotor.RunMode.PID, false);
-        right = new CoolMotor(hardwareMap.get(DcMotorEx.class, "lr"), CoolMotor.RunMode.PID, false);
+//        left  = new CoolMotor(hardwareMap.get(DcMotorEx.class, "ll"), CoolMotor.RunMode.PID, false);
+//        right = new CoolMotor(hardwareMap.get(DcMotorEx.class, "lr"), CoolMotor.RunMode.PID, false);
+
+        left = hardwareMap.get(DcMotorEx.class, "ll");
+        right = hardwareMap.get(DcMotorEx.class, "lr");
+
+        left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        left.setTargetPosition(0);
+        right.setTargetPosition(0);
+
+        left.setPower(1);
+        right.setPower(1);
+
+        left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         telemetry = tel;
         gamepad1 = new StickyGamepads(g1);
@@ -65,16 +84,12 @@ public class Elevator{
     public void loop(){
         controls();
 
-        left.setPIDF(pidCoefficients, ff1 + ff2 * left.motor.getCurrentPosition());
-        right.setPIDF(pidCoefficients, ff1 + ff2 * left.motor.getCurrentPosition());
+        if(gotoPos == 0) gotoPos = -5;
 
-        left.calculatePower(left.motor.getCurrentPosition(), gotoPos);
-        right.calculatePower(left.motor.getCurrentPosition(), gotoPos);
+        left.setTargetPosition(gotoPos);
+        right.setTargetPosition(gotoPos);
 
-        left.update();
-        right.update();
-
-        telemetry.addData("current position", left.motor.getCurrentPosition());
+        telemetry.addData("current position", left.getCurrentPosition());
         telemetry.addData("level", lift_level);
         telemetry.addData("target position", gotoPos);
 

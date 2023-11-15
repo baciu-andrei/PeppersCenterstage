@@ -27,6 +27,7 @@ public class OpClaw {
         gripperFront(gripperInit);
         rotateOuttake(rotationInit);
         virtual(virtualInit);
+        setAng(angleInit);
     }
     public void gripperBack(double pos)
     {
