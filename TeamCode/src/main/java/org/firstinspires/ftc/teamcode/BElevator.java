@@ -7,11 +7,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.teamcode.IStateBasedModule;
-
 import java.util.ArrayList;
 
-public class Elevator implements IStateBasedModule {
+public class BElevator implements IStateBasedModule {
 
     DcMotorEx ll;
     DcMotorEx lr;
@@ -62,7 +60,7 @@ public class Elevator implements IStateBasedModule {
         State.TRANSFER.position = transferPos + groundPos;
         State.GOING_TRANSFER.position = transferPos + groundPos;
     }
-    public Elevator(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, State initialState)
+    public BElevator(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, State initialState)
     {
         init(hm,gamepad1,gamepad2,initialState);
     }
