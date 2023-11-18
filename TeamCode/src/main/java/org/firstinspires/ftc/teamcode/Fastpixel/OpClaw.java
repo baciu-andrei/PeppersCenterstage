@@ -21,6 +21,8 @@ public class OpClaw {
         g2 = hm.get(Servo.class, "gripper2");
         angle = hm.get(Servo.class, "angle");
 
+
+        r.setDirection(Servo.Direction.REVERSE);
         v1.setDirection(Servo.Direction.REVERSE);
         g2.setDirection(Servo.Direction.REVERSE);
         gripperBack(gripperInit);

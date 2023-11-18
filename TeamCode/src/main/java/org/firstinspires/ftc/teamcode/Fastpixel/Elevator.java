@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Fastpixel;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -8,7 +9,7 @@ import com.qualcomm.robotcore.hardware.*;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Utils.CoolMotor;
 import org.firstinspires.ftc.teamcode.Utils.StickyGamepads;
-
+@Config
 public class Elevator{
 
 //    final private CoolMotor left, right;
@@ -18,7 +19,8 @@ public class Elevator{
 //
 //    public static double ff1 = 0.1, ff2 = 0.00009;
     final private double fullExtend = 950;
-    private int lift_level;
+    public static int offset = 5;
+    private int lift_level ;
     public int gotoPos;
     final private double CPR = 103.8, diametruSpool = 32, oneStep = fullExtend/11;
 
@@ -81,12 +83,12 @@ public class Elevator{
         gamepad2.update();
     }
 
-    public void loop(){
+    public void loop(){   
         controls();
 
         if(gotoPos == 0) gotoPos = -5;
 
-        left.setTargetPosition(gotoPos);
+        left.setTargetPosition(gotoPos + offset);
         right.setTargetPosition(gotoPos);
 
         telemetry.addData("current position", left.getCurrentPosition());
