@@ -13,22 +13,13 @@ public class BElevator implements IStateBasedModule {
 
     DcMotorEx ll;
     DcMotorEx lr;
-
-    Gamepad gamepad1, gamepad2;
     static int groundPos = 0, level = 0, incrementPos = 50, firstLevelPos = 20, transferPos = 40;
 
-
-
-    /*TODO
-     *  updateState() reseting,next State
-     *  updateHardware() , reset motor power , pid motoare
-     *  update la final
-     *  write in gamepad
-     *  */
     enum State{
         DOWN(groundPos), GOING_DOWN(groundPos, DOWN),
         UP(groundPos + firstLevelPos +level* incrementPos), GOING_UP(groundPos + firstLevelPos +level* incrementPos, UP),
         TRANSFER(transferPos), GOING_TRANSFER(transferPos, TRANSFER),
+
         RESETING(groundPos, DOWN);
 
         public int position;
@@ -59,19 +50,12 @@ public class BElevator implements IStateBasedModule {
         State.GOING_UP.position = groundPos + firstLevelPos + incrementPos*level;
         State.TRANSFER.position = transferPos + groundPos;
         State.GOING_TRANSFER.position = transferPos + groundPos;
+        State.RESETING.position = groundPos;
     }
     public BElevator(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, State initialState)
     {
-        init(hm,gamepad1,gamepad2,initialState);
-    }
-
-    public void init(HardwareMap hm, Gamepad gamepad1, Gamepad gamepad2, State initialState)
-    {
         ll = hm.get(DcMotorEx.class, "ll");
         lr = hm.get(DcMotorEx.class, "lr");
-
-        ll.setDirection(DcMotorSimple.Direction.REVERSE);
-        lr.setDirection(DcMotorSimple.Direction.REVERSE);
 
         ArrayList<DcMotorEx> motorListElevator = new ArrayList<>();
         motorListElevator.add(ll);
@@ -86,8 +70,7 @@ public class BElevator implements IStateBasedModule {
             motorElevator.setMotorType(motorConfigurationType);
         }
 
-        this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
+
         this.state = initialState;
     }
     public void update(){
@@ -97,19 +80,31 @@ public class BElevator implements IStateBasedModule {
     }
     @Override
     public void updateState() {
-        if(this.state == State.RESETING)
+        if(this.state == State.RESETING&&Math.abs(ll.getVelocity())<=0)
         {
-            //RESET CODE IDK
+            groundPos = ll.getCurrentPosition();
+            state = state.nextState;
         }
         else
         {
-
+            if(state.nextState.position==ll.getCurrentPosition())
+            {
+                state = state.nextState;
+            }
         }
     }
 
     @Override
     public void updateHardware() {
-
+        if(state == State.RESETING)
+        {
+            ll.setPower(-0.5);
+            lr.setPower(-0.5);
+        }
+        else {
+            ll.setTargetPosition(state.position);
+            lr.setTargetPosition(state.position);
+        }
     }
 
 }
