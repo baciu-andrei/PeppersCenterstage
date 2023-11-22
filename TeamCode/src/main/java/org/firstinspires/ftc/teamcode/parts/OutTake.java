@@ -33,8 +33,6 @@ public class OutTake {
     private static int feedForwardLevel = 3;
     private StickyGamepads gamepad1, gamepad2;
 
-    private boolean retract, go_to_0;
-
     public int RetractLevel = 4;
     public OutTake(HardwareMap hm, Gamepad gp1, Gamepad gp2, Telemetry tele){
         elevator = new Elevator(hm, gp1, gp2, tele);
@@ -53,6 +51,7 @@ public class OutTake {
         switch (STATE){
             case SHOUD_RETRACT:
                 elevator.setLevel(RetractLevel);
+                arm.deactivate();
                 STATE = STATES_OOUTTAKE.WAIT_FOR_ELEVATOR_REST;
                 STATES_OOUTTAKE.pos = RetractLevel;
                 break;
@@ -73,7 +72,6 @@ public class OutTake {
                 if(elevator.getLevelNow() == STATES_OOUTTAKE.pos){
                     if(STATES_OOUTTAKE.pos == RetractLevel) {
                         STATE = STATES_OOUTTAKE.WAIT_FOR_ARM_REST;
-                        arm.deactivate();
                     } else if(STATES_OOUTTAKE.pos == 0){
                         STATE = STATES_OOUTTAKE.READY_FOR_PIXELS;
                     }
@@ -81,14 +79,27 @@ public class OutTake {
                 break;
         }
 
-        if(elevator.getLevelNow() >= 3 && elevator.STATE == LiftStates.GO_UP){
+        if(elevator.getLevelNow() >= 3 && elevator.STATE == LiftStates.GO_UP && STATE != STATES_OOUTTAKE.SHOUD_RETRACT){
             arm.activate();
+            arm.rotate90();
         }
 
-        if(gamepad2.y){
-            arm.deactivate();
-            STATE = STATES_OOUTTAKE.WAIT_FOR_ARM_REST;
+        if(gamepad2.y && elevator.getLevelNow() > 0){
+            STATE = STATES_OOUTTAKE.SHOUD_RETRACT;
         }
+
+        if(gamepad2.b){
+            if(arm.isRotated) arm.antiRotate90();
+            else arm.rotate90();
+        }
+
+        if(gamepad2.right_bumper){
+            arm.signalClaw1();
+        }
+        if(gamepad2.left_bumper){
+            arm.signalClaw2();
+        }
+
 
         arm.update();
         elevator.loop();

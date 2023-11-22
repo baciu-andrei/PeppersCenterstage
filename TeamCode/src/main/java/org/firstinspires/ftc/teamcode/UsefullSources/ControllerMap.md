@@ -1,28 +1,21 @@
 ## CONTROLLER 1
 
-A - outtake                 -- activate outtake
-B - lift pt gripper         -- ala de te spanzura
-X - launch drone            -- lanseaza drona
-Y - catch                   -- activeaza/dezactiveaza ambele claw-uri deodata
-
-RSTICK - movement           -- te misti
-LSTICK - lift up/down       -- muti liftu cum te taie capu
-DPAD - lift levels          -- muti liftu pe 11 nivele
-
-RTRIGGER - rotate robot     -- roteste botu spre dreapta
-LTRIGGER - rotate robot     -- roteste botu spre stanga
+A - intake jos/sus
+B - one step
+X - 
+Y - 
 
 ## CONTROLLER 2
 
-A - activate/deactivate intake -- da power on/off la intake
-B - rotate 180              -- roteste storage-ul cu pixeli 180 de grade (da swap)
-X - fedding
-Y - rotate -90              -- roteste storage-ul cu pixeli 90 grade spre drapta
+A - 
+B - switch pixels
+X - activate intake
+Y - retract elevator
 
-RSTICK -
-LSTICK - 
-DPAD - intake levels        -- comuta din 5 nivele de intake
+dpad_up - +level
+dpad_down - -level
+dpad_right - full_up
+dpad_left - full_down
 
-RTRIGGER - claw dreapta     -- da drumu la claw din drapta
-LTRIGGER - claw stanga      -- da drumu la claw din stanga
-
+RB - calw1
+LB - claw2

@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.components;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
@@ -15,7 +17,8 @@ public class Elevator{
 
 	public LiftStates STATE;
 
-    final private CoolMotor left, right;
+//    final private CoolMotor left, right;
+	final private DcMotor left, right;
 	StickyGamepads gamepad1, gamepad2;
 	public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.03,0.13,0.00035);
 
@@ -25,13 +28,31 @@ public class Elevator{
 	public int gotoPos;
 	final private double CPR = 103.8, diametruSpool = 32, oneStep = fullExtend/11;
 
-	final public AMP profile = new AMP(8000, 5000, 3500);
+//	final public AMP profile = new AMP(8000, 5000, 3500);
 
 	Telemetry telemetry;
 
 	public Elevator(HardwareMap hardwareMap, Gamepad g1, Gamepad g2, Telemetry tel){
-		left  = new CoolMotor(hardwareMap.get(DcMotorEx.class, "ll"), CoolMotor.RunMode.PID, false);
-		right = new CoolMotor(hardwareMap.get(DcMotorEx.class, "lr"), CoolMotor.RunMode.PID, false);
+//		left  = new CoolMotor(hardwareMap.get(DcMotorEx.class, "ll"), CoolMotor.RunMode.PID, false);
+//		right = new CoolMotor(hardwareMap.get(DcMotorEx.class, "lr"), CoolMotor.RunMode.PID, false);
+
+		left = hardwareMap.get(DcMotor.class, "ll");
+		right = hardwareMap.get(DcMotor.class, "lr");
+
+		left.setDirection(DcMotorSimple.Direction.REVERSE);
+
+		left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+		right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+		left.setTargetPosition(0);
+		right.setTargetPosition(0);
+
+		left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
 		telemetry = tel;
 		gamepad1 = new StickyGamepads(g1);
@@ -39,7 +60,7 @@ public class Elevator{
 
 		STATE = LiftStates.STATIC;
 
-		profile.setMotion(0,0,0);
+//		profile.setMotion(0,0,0);
 
 	}
 
@@ -50,7 +71,7 @@ public class Elevator{
 			else{
 				gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
 				STATE = LiftStates.GO_UP;
-				profile.setMotion(profile.getPosition(), gotoPos, profile.getVelocity());
+//				profile.setMotion(profile.getPosition(), gotoPos, profile.getVelocity());
 			}
 		}
 
@@ -60,7 +81,7 @@ public class Elevator{
 			else{
 				gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
 				STATE = LiftStates.GO_DOWN;
-				profile.setMotion(profile.getPosition(), gotoPos, profile.getVelocity());
+//				profile.setMotion(profile.getPosition(), gotoPos, profile.getVelocity());
 			}
 		}
 
@@ -68,14 +89,14 @@ public class Elevator{
 			lift_level = 0;
 			gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
 			STATE = LiftStates.GO_DOWN;
-			profile.setMotion(profile.getPosition(), gotoPos, profile.getVelocity());
+//			profile.setMotion(profile.getPosition(), gotoPos, profile.getVelocity());
 		}
 
 		if(gamepad2.dpad_right){
 			lift_level = 11;
 			gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
 			STATE = LiftStates.GO_UP;
-			profile.setMotion(profile.getPosition(), gotoPos, profile.getVelocity());
+//			profile.setMotion(profile.getPosition(), gotoPos, profile.getVelocity());
 		}
 
 
@@ -86,31 +107,32 @@ public class Elevator{
 	public void loop(){
 		controls();
 
-		int target = (int)profile.getPosition();
+//		int target = (int)profile.getPosition();
 
+		if(left.getCurrentPosition() == gotoPos) STATE = LiftStates.STATIC;
 
 //		if(Math.abs(target - left.motor.getCurrentPosition()) == 0) STATE.state = LiftStates.STATES.STATIC;
 
-		left.setPIDF(pidCoefficients, ff1 + ff2 * target);
-		right.setPIDF(pidCoefficients, ff1 + ff2 * target);
+//		left.setPIDF(pidCoefficients, ff1 + ff2 * target);
+//		right.setPIDF(pidCoefficients, ff1 + ff2 * target);
+//
+//		left.calculatePower(left.motor.getCurrentPosition(), target);
+//		right.calculatePower(left.motor.getCurrentPosition(), target);
+//
+//		left.update();
+//		right.update();
+//		profile.update();
 
-		left.calculatePower(left.motor.getCurrentPosition(), target);
-		right.calculatePower(right.motor.getCurrentPosition(), target);
+		left.setTargetPosition(gotoPos);
+		right.setTargetPosition(gotoPos);
 
-		if(lift_level == 0){
-			left.motor.setTargetPosition(0);
-			right.motor.setTargetPosition(0);
-		}
+		left.setPower(1);
+		right.setPower(1);
 
-		left.update();
-		right.update();
-		profile.update();
-
-
-		telemetry.addData("current position", left.motor.getCurrentPosition());
+		telemetry.addData("left current position", left.getCurrentPosition());
+		telemetry.addData("right current position", right.getCurrentPosition());
 		telemetry.addData("level", lift_level);
 		telemetry.addData("target position", gotoPos);
-		telemetry.addData("step lift", oneStep);
 
 		telemetry.update();
 	}
@@ -127,12 +149,12 @@ public class Elevator{
 		lift_level = level_correct;
 
 		gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
-		profile.setMotion(profile.getPosition(), gotoPos, profile.getSignedVelocity());
+//		profile.setMotion(profile.getPosition(), gotoPos, profile.getSignedVelocity());
 
 	}
 
 	public int getLevel(){ return lift_level; }
 	public LiftStates getLiftState(){ return STATE; }
 
-	public int getLevelNow(){ return (int) Math.floor(left.motor.getCurrentPosition()/oneStep); }
+	public int getLevelNow(){ return (int) Math.floor(left.getCurrentPosition()/oneStep); }
 }

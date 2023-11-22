@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.parts;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -22,7 +23,7 @@ import java.util.Collection;
 
 
 
-
+@Config
 public class DriveTrain{
     public static class DriveParameters{
         public double forward, right , turn;

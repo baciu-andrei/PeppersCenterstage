@@ -24,7 +24,7 @@ public class OpMode extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
         driveTrain = new DriveTrain(hardwareMap, gamepad1, gamepad2, telemetry);
         outTake = new OutTake(hardwareMap, gamepad1, gamepad2, telemetry);
-        intake = new Intake(hardwareMap, gamepad1, gamepad2);
+        intake = new Intake(hardwareMap, gamepad1, gamepad2, telemetry);
     }
 
     @Override
