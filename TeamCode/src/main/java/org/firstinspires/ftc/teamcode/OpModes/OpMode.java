@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.components.Elevator;
 import org.firstinspires.ftc.teamcode.parts.DriveTrain;
@@ -32,11 +33,13 @@ public class OpMode extends LinearOpMode {
         initialize();
 
         waitForStart();
-
+        ElapsedTime freq = new ElapsedTime();
         while(opModeIsActive() && !isStopRequested()) {
+            freq.reset();
             driveTrain.run();
             outTake.loop();
             intake.loop();
+            telemetry.addData("freq", freq.milliseconds());
         }
     }
 }

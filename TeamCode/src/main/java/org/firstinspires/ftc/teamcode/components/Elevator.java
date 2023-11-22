@@ -23,7 +23,7 @@ public class Elevator{
 	public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.03,0.13,0.00035);
 
 	public static double ff1 = 0.07, ff2 = 0.00035;
-	final private double fullExtend = (int)(972);
+	final private double fullExtend = (int)(950);
 	private int lift_level;
 	public int gotoPos;
 	final private double CPR = 103.8, diametruSpool = 32, oneStep = fullExtend/11;
@@ -52,6 +52,9 @@ public class Elevator{
 
 		left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+		left.setPower(1);
+		right.setPower(1);
 
 
 		telemetry = tel;
@@ -109,8 +112,13 @@ public class Elevator{
 
 //		int target = (int)profile.getPosition();
 
-		if(left.getCurrentPosition() == gotoPos) STATE = LiftStates.STATIC;
-
+		if(right.getCurrentPosition() == gotoPos) STATE = LiftStates.STATIC;
+		if(STATE != LiftStates.STATIC){
+			left.setTargetPosition(gotoPos);
+			right.setTargetPosition(gotoPos);
+			left.setPower(1);
+			right.setPower(1);
+		}
 //		if(Math.abs(target - left.motor.getCurrentPosition()) == 0) STATE.state = LiftStates.STATES.STATIC;
 
 //		left.setPIDF(pidCoefficients, ff1 + ff2 * target);
@@ -123,13 +131,6 @@ public class Elevator{
 //		right.update();
 //		profile.update();
 
-		left.setTargetPosition(gotoPos);
-		right.setTargetPosition(gotoPos);
-
-		left.setPower(1);
-		right.setPower(1);
-
-		telemetry.addData("left current position", left.getCurrentPosition());
 		telemetry.addData("right current position", right.getCurrentPosition());
 		telemetry.addData("level", lift_level);
 		telemetry.addData("target position", gotoPos);
@@ -156,5 +157,5 @@ public class Elevator{
 	public int getLevel(){ return lift_level; }
 	public LiftStates getLiftState(){ return STATE; }
 
-	public int getLevelNow(){ return (int) Math.floor(left.getCurrentPosition()/oneStep); }
+	public int getLevelNow(){ return (int) Math.floor(right.getCurrentPosition()/oneStep); }
 }

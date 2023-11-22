@@ -82,7 +82,5 @@ public class Intake {
         gamepad1.update();
         gamepad2.update();
 
-        tel.addData("servo max_intake", intake_servo);
-
     }
 }

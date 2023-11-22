@@ -8,12 +8,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.components.BratOutTake;
 import org.firstinspires.ftc.teamcode.components.Elevator;
+import org.firstinspires.ftc.teamcode.components.Grippers;
 import org.firstinspires.ftc.teamcode.utils.StickyGamepads;
 import org.firstinspires.ftc.teamcode.components.LiftStates;
 
 @Config
 public class OutTake {
-    private static enum STATES_OOUTTAKE {
+    private enum STATES_OOUTTAKE {
         RESET_ELEVATOR,
         SET_FEED_FORWARD,
         SHOUD_RETRACT,
@@ -26,17 +27,18 @@ public class OutTake {
 
     ;
     STATES_OOUTTAKE STATE;
-    private Elevator elevator;
-    private BratOutTake arm;
+    private final Elevator elevator;
+    private final BratOutTake arm;
+    private final Grippers grippers;
     private Telemetry telemetry;
 
-    private static int feedForwardLevel = 3;
     private StickyGamepads gamepad1, gamepad2;
 
     public int RetractLevel = 4;
     public OutTake(HardwareMap hm, Gamepad gp1, Gamepad gp2, Telemetry tele){
         elevator = new Elevator(hm, gp1, gp2, tele);
         arm = new BratOutTake(hm, tele);
+        grippers = new Grippers(hm, tele);
 
         telemetry = tele;
         STATE = STATES_OOUTTAKE.READY_FOR_PIXELS;
@@ -79,6 +81,10 @@ public class OutTake {
                 break;
         }
 
+        if(elevator.getLevel() != 0){
+            grippers.dezactivateAuto();
+        } else grippers.activateAuto();
+
         if(elevator.getLevelNow() >= 3 && elevator.STATE == LiftStates.GO_UP && STATE != STATES_OOUTTAKE.SHOUD_RETRACT){
             arm.activate();
             arm.rotate90();
@@ -86,6 +92,7 @@ public class OutTake {
 
         if(gamepad2.y && elevator.getLevelNow() > 0){
             STATE = STATES_OOUTTAKE.SHOUD_RETRACT;
+            grippers.reset();
         }
 
         if(gamepad2.b){
@@ -94,14 +101,15 @@ public class OutTake {
         }
 
         if(gamepad2.right_bumper){
-            arm.signalClaw1();
+            grippers.reset_claw_1();
         }
         if(gamepad2.left_bumper){
-            arm.signalClaw2();
+            grippers.reset_claw_2();
         }
 
 
         arm.update();
+        grippers.update();
         elevator.loop();
         gamepad2.update();
         gamepad1.update();
