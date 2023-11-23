@@ -47,11 +47,15 @@ public class Intake {
         gamepad2 = new StickyGamepads(gp2);
 
     }
-    private boolean IntakeOn = false, go_up;
+    private boolean IntakeOn = false, go_up, intake_reverse;
     public void loop(){
         if(gamepad1.x) {
             IntakeOn = !IntakeOn;
-
+            intake_reverse = false;
+        }
+        if(gamepad1.y){
+            intake_reverse = true;
+            IntakeOn = !IntakeOn;
         }
         if(gamepad1.a){
             if(intake_level == MAX_LEVELS)
@@ -76,6 +80,13 @@ public class Intake {
         }
 
         intake_servo.setPosition(intake_level * step_pos);
+
+        if(intake_reverse){
+            intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        } else {
+            intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        }
+
         if(IntakeOn) intakeMotor.setPower(1);
         else intakeMotor.setPower(0);
 

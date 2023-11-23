@@ -100,10 +100,10 @@ public class OutTake {
             else arm.rotate90();
         }
 
-        if(gamepad2.right_bumper){
+        if(gamepad1.right_bumper){
             grippers.reset_claw_1();
         }
-        if(gamepad2.left_bumper){
+        if(gamepad1.left_bumper){
             grippers.reset_claw_2();
         }
 
