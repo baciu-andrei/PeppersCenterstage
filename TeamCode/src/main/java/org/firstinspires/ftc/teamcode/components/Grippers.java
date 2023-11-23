@@ -4,15 +4,11 @@ import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.internal.hardware.android.Rev3328;
 
 @Config
 public class Grippers {

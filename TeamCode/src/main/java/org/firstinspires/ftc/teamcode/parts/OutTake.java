@@ -32,7 +32,8 @@ public class OutTake {
     private final Grippers grippers;
     private Telemetry telemetry;
 
-    private StickyGamepads gamepad1, gamepad2;
+    public boolean retractElevator, switchAngles, claw1Reset, claw2Reset,
+                    fullExtend, oneStepUp, oneStepDown;
 
     public int RetractLevel = 4;
     public OutTake(HardwareMap hm, Gamepad gp1, Gamepad gp2, Telemetry tele){
@@ -42,14 +43,42 @@ public class OutTake {
 
         telemetry = tele;
         STATE = STATES_OOUTTAKE.READY_FOR_PIXELS;
+    }
 
-        gamepad1 = new StickyGamepads(gp1);
-        gamepad2 = new StickyGamepads(gp2);
+    private void handleControls(){
+
+        ///////// ELEVATOR /////////
+        if(retractElevator && elevator.getLevelNow() > 0){
+            STATE = STATES_OOUTTAKE.SHOUD_RETRACT;
+            grippers.reset();
+        }
+        if(fullExtend){
+            elevator.setLevel(11);
+        }
+        if(oneStepUp){
+            elevator.setLevel(elevator.getLevel() + 1);
+        }
+        if(oneStepDown){
+            elevator.setLevel(elevator.getLevel() - 1);
+        }
+
+        ///////// ARM ///////////
+        if(switchAngles){
+            if(arm.isRotated) arm.antiRotate90();
+            else arm.rotate90();
+        }
+
+        //////// CLAW //////////
+        if(claw1Reset){
+            grippers.reset_claw_1();
+        }
+        if(claw2Reset){
+            grippers.reset_claw_2();
+        }
 
     }
 
-    public void loop(){
-
+    public void update(){
         switch (STATE){
             case SHOUD_RETRACT:
                 elevator.setLevel(RetractLevel);
@@ -79,39 +108,32 @@ public class OutTake {
                     }
                 }
                 break;
+            case READY_FOR_PIXELS:
+                if(elevator.getLevelNow() >= 3){
+                    arm.activate();
+                    arm.rotate90();
+                }
+                break;
         }
 
         if(elevator.getLevel() != 0){
             grippers.dezactivateAuto();
         } else grippers.activateAuto();
 
-        if(elevator.getLevelNow() >= 3 && elevator.STATE == LiftStates.GO_UP && STATE != STATES_OOUTTAKE.SHOUD_RETRACT){
-            arm.activate();
-            arm.rotate90();
-        }
 
-        if(gamepad2.y && elevator.getLevelNow() > 0){
-            STATE = STATES_OOUTTAKE.SHOUD_RETRACT;
-            grippers.reset();
-        }
+        retractElevator = false;
+        switchAngles = false;
+        claw1Reset = false;
+        claw2Reset = false;
+        fullExtend = false;
+        oneStepDown = false;
+        oneStepUp = false;
 
-        if(gamepad2.b){
-            if(arm.isRotated) arm.antiRotate90();
-            else arm.rotate90();
-        }
 
-        if(gamepad1.right_bumper){
-            grippers.reset_claw_1();
-        }
-        if(gamepad1.left_bumper){
-            grippers.reset_claw_2();
-        }
-
+        handleControls();
 
         arm.update();
         grippers.update();
         elevator.loop();
-        gamepad2.update();
-        gamepad1.update();
     }
 }

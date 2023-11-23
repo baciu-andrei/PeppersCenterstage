@@ -57,51 +57,20 @@ public class Elevator{
 
 	}
 
-	private void controls(){
-		if(gamepad2.dpad_up){
-			lift_level ++;
-			if(lift_level > 11) lift_level = 11;
-			else{
-				gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
-				STATE = LiftStates.GO_UP;
-			}
-		}
-
-		if(gamepad2.dpad_down){
-			lift_level --;
-			if(lift_level < 0) lift_level = 0;
-			else{
-				gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
-				STATE = LiftStates.GO_DOWN;
-			}
-		}
-
-		if(gamepad2.dpad_left){
-			lift_level = 0;
-			gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
-			STATE = LiftStates.GO_DOWN;
-		}
-
-		if(gamepad2.dpad_right){
-			lift_level = 11;
-			gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
-			STATE = LiftStates.GO_UP;
-		}
-
-
-		gamepad1.update();
-		gamepad2.update();
-	}
-
 	public void loop(){
-		controls();
-
-		if(right.getCurrentPosition() == gotoPos) STATE = LiftStates.STATIC;
 
 		left.setTargetPosition(gotoPos);
 		right.setTargetPosition(gotoPos);
+
 		left.setPower(1);
 		right.setPower(1);
+
+		if(right.getCurrentPosition() == gotoPos) STATE = LiftStates.STATIC;
+
+		if(lift_level == 0){
+			left.setPower(-0.015);
+			right.setPower(-0.015);
+		}
 
 		telemetry.addData("right current position", right.getCurrentPosition());
 		telemetry.addData("level", lift_level);
@@ -111,15 +80,16 @@ public class Elevator{
 	}
 
 	public void setLevel(int level){
-		int level_correct;
-		if(level < 0) level_correct = 0;
-		else if(level > 11) level_correct = 11;
-		else level_correct = level;
+		int level_corrected;
 
-		if(level_correct > lift_level) STATE= LiftStates.GO_UP;
-		else if(level_correct < lift_level) STATE = LiftStates.GO_DOWN;
+		if(level < 0) level_corrected = 0;
+		else if(level > 11) level_corrected = 11;
+		else level_corrected = level;
+
+		if(level_corrected > lift_level) STATE= LiftStates.GO_UP;
+		else if(level_corrected < lift_level) STATE = LiftStates.GO_DOWN;
 		else STATE= LiftStates.STATIC;
-		lift_level = level_correct;
+		lift_level = level_corrected;
 
 		gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
 
