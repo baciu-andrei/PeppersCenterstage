@@ -50,6 +50,9 @@ public class Controls {
             intake.acivateNormalIntake   = false;
             intake.activateReveredIntake = true;
         }
+
+        intake.loop();
+        outTake.update();
     }
 
 

@@ -59,6 +59,10 @@ public class Elevator{
 
 	public void loop(){
 
+		if(lift_level == 0){
+			gotoPos = -5;
+		}
+
 		left.setTargetPosition(gotoPos);
 		right.setTargetPosition(gotoPos);
 
@@ -67,10 +71,6 @@ public class Elevator{
 
 		if(right.getCurrentPosition() == gotoPos) STATE = LiftStates.STATIC;
 
-		if(lift_level == 0){
-			left.setPower(-0.015);
-			right.setPower(-0.015);
-		}
 
 		telemetry.addData("right current position", right.getCurrentPosition());
 		telemetry.addData("level", lift_level);

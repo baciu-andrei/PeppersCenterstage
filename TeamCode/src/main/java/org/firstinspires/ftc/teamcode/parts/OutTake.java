@@ -81,8 +81,8 @@ public class OutTake {
     public void update(){
         switch (STATE){
             case SHOUD_RETRACT:
-                elevator.setLevel(RetractLevel);
                 arm.deactivate();
+                elevator.setLevel(RetractLevel);
                 STATE = STATES_OOUTTAKE.WAIT_FOR_ELEVATOR_REST;
                 STATES_OOUTTAKE.pos = RetractLevel;
                 break;
@@ -121,13 +121,6 @@ public class OutTake {
         } else grippers.activateAuto();
 
 
-        retractElevator = false;
-        switchAngles = false;
-        claw1Reset = false;
-        claw2Reset = false;
-        fullExtend = false;
-        oneStepDown = false;
-        oneStepUp = false;
 
 
         handleControls();
@@ -135,5 +128,13 @@ public class OutTake {
         arm.update();
         grippers.update();
         elevator.loop();
+
+        retractElevator = false;
+        switchAngles = false;
+        claw1Reset = false;
+        claw2Reset = false;
+        fullExtend = false;
+        oneStepDown = false;
+        oneStepUp = false;
     }
 }
