@@ -19,7 +19,6 @@ public class Intake {
     private static Servo intake_servo;
     public int intake_level = 0;
     public static final int MAX_LEVELS = 5;
-    public static double max_up = 1;
     private Telemetry tel;
     public static double step_pos = 0.83/MAX_LEVELS;
 
@@ -31,15 +30,13 @@ public class Intake {
 
 
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         MotorConfigurationType mct = intakeMotor.getMotorType().clone();
         mct.setAchieveableMaxRPMFraction(1.0);
+        intakeMotor.setMotorType(mct);
 
         intake_level = MAX_LEVELS;
 
-        intakeMotor.setMotorType(mct);
-
-        go_up = false;
         intake_servo.setPosition(intake_level * step_pos);
 
         tel = tele;
@@ -47,51 +44,31 @@ public class Intake {
         gamepad2 = new StickyGamepads(gp2);
 
     }
-    private boolean IntakeOn = false, go_up, intake_reverse;
+    private boolean IntakeOn = false;
     public void loop(){
-        if(gamepad1.x) {
-            IntakeOn = !IntakeOn;
-            intake_reverse = false;
-        }
-        if(gamepad1.y){
-            intake_reverse = true;
-            IntakeOn = !IntakeOn;
-        }
-        if(gamepad1.a){
-            if(intake_level == MAX_LEVELS)
-                intake_level = 0;
-            else intake_level = MAX_LEVELS;
-        }
-        if(gamepad1.b){
-            if(go_up) intake_level ++;
-            else intake_level --;
-
-            if(go_up){
-                if(intake_level > MAX_LEVELS){intake_level = MAX_LEVELS - 1; go_up = false;}
-            } else {
-                if(intake_level < 0){intake_level = 1; go_up = true; }
-            }
-        }
-        if(gamepad2.x){
-            IntakeOn = !IntakeOn;
-            if(IntakeOn) intake_level = 0;
-            else intake_level = MAX_LEVELS;
-
-        }
-
-        intake_servo.setPosition(intake_level * step_pos);
-
-        if(intake_reverse){
-            intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        } else {
+        if(gamepad2.gamepad.right_trigger != 0){
             intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+            IntakeOn = true;
+        } else IntakeOn = false;
+
+        if(gamepad2.gamepad.left_trigger != 0){
+            intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            IntakeOn = true;
+        } else if(gamepad2.gamepad.right_trigger == 0) IntakeOn = false;
+
+        if(IntakeOn){
+            intake_servo.setPosition(0 * step_pos);
+        } else {
+            intake_servo.setPosition(intake_level * step_pos);
         }
 
-        if(IntakeOn) intakeMotor.setPower(1);
+        if(IntakeOn) intakeMotor.setPower(0.8);
         else intakeMotor.setPower(0);
 
         gamepad1.update();
         gamepad2.update();
+
+        tel.addData("Motor Direction", intakeMotor.getDirection().toString());
 
     }
 }

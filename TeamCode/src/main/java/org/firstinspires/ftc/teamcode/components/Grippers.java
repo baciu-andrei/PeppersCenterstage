@@ -4,45 +4,51 @@ import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.internal.hardware.android.Rev3328;
+import org.firstinspires.ftc.teamcode.utils.StickyGamepads;
 
 @Config
 public class Grippers {
     private final Servo claw1, claw2;
-    public static double open_claw1 = 0.05, close_claw1 = 0.465,
-                        open_claw2 = 0, close_claw2 = 0.456;
+    public static int ticks_trashhold = 5, ticks_for_sensor1 = 0, ticks_for_sensor2 = 0;
+    public static double open_claw1 = 0, close_claw1 = 0.8,
+                        open_claw2 = 0.07, close_claw2 = 0.8;
 
     private boolean active_claw_1, active_claw_2;
     private boolean auto_claw1, auto_claw2;
 
     private final RevColorSensorV3 back_sensor, front_sensor;
     public static double trashhold_back = 15, trashhold_front = 15;
-    public static boolean ActivateAutoSensors = true;
+    public static boolean ActivateAutoSensors = true, ActivateAutomatic = true;
 
     public void update(){
         double back_dist = back_sensor.getDistance(DistanceUnit.MM);
         double front_dist = front_sensor.getDistance(DistanceUnit.MM);
 
-        if(!auto_claw1 && back_dist <= trashhold_back){
+        if(ActivateAutomatic && !auto_claw1 && back_dist <= trashhold_back){
+            ++ ticks_for_sensor1;
+        } else ticks_for_sensor1 = 0;
+
+        if(ActivateAutomatic && auto_claw1 && !auto_claw2 && front_dist <= trashhold_front) {
+            ++ ticks_for_sensor2;
+        } else ticks_for_sensor2 = 0;
+
+        if(ticks_for_sensor1 >= ticks_trashhold){
             auto_claw1 = true;
         }
-
-        if(auto_claw1 && !auto_claw2 && front_dist <= trashhold_front) {
+        if(ticks_for_sensor2 >= ticks_trashhold){
             auto_claw2 = true;
         }
 
-        if(ActivateAutoSensors) {
+        if(ActivateAutoSensors && ActivateAutomatic) {
             active_claw_1 = auto_claw1;
             active_claw_2 = auto_claw2;
         }
+
 
         if(active_claw_1) claw1.setPosition(close_claw1);
         else claw1.setPosition(open_claw1);
@@ -72,6 +78,13 @@ public class Grippers {
         telemetry = tele;
 
         update();
+    }
+
+    public void srl1(){
+        active_claw_1 = !active_claw_1;
+    }
+    public void srl2(){
+        active_claw_2 = !active_claw_2;
     }
 
     public void reset_claw_1(){
