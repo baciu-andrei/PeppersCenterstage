@@ -18,8 +18,6 @@ public class Elevator{
 	public LiftStates STATE;
 
 	final private DcMotor left, right;
-	StickyGamepads gamepad1, gamepad2;
-
 	final private double fullExtend = (int)(950);
 	private int lift_level;
 	public int gotoPos;
@@ -27,7 +25,7 @@ public class Elevator{
 
 	Telemetry telemetry;
 
-	public Elevator(HardwareMap hardwareMap, Gamepad g1, Gamepad g2, Telemetry tel){
+	public Elevator(HardwareMap hardwareMap, Telemetry tel){
 		left = hardwareMap.get(DcMotor.class, "ll");
 		right = hardwareMap.get(DcMotor.class, "lr");
 
@@ -50,8 +48,6 @@ public class Elevator{
 
 
 		telemetry = tel;
-		gamepad1 = new StickyGamepads(g1);
-		gamepad2 = new StickyGamepads(g2);
 
 		STATE = LiftStates.STATIC;
 
@@ -100,5 +96,5 @@ public class Elevator{
 	}
 
 	public int getLevel(){ return lift_level; }
-	public int getLevelNow(){ return (int) Math.floor(right.getCurrentPosition()/oneStep); }
+	public double getLevelNow(){ return right.getCurrentPosition()/oneStep; }
 }

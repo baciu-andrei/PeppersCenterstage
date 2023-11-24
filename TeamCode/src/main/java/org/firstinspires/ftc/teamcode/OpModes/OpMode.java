@@ -26,11 +26,11 @@ public class OpMode extends LinearOpMode {
     FtcDashboard dash;
     public void initialize(){
         dash = FtcDashboard.getInstance();
+        controls = new Controls(gamepad1, gamepad2);
         telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
         driveTrain = new DriveTrain(hardwareMap, gamepad1, gamepad2, telemetry);
-        outTake = new OutTake(hardwareMap, gamepad1, gamepad2, telemetry);
-        intake = new Intake(hardwareMap, gamepad1, gamepad2, telemetry);
-        controls = new Controls(intake, outTake, gamepad1, gamepad2);
+        outTake = new OutTake(hardwareMap, controls, telemetry);
+        intake = new Intake(hardwareMap, controls, telemetry);
 
     }
 
@@ -43,7 +43,7 @@ public class OpMode extends LinearOpMode {
         while(opModeIsActive() && !isStopRequested()) {
             freq.reset();
 
-            controls.TwoPlayers();
+            controls.update();
 
             driveTrain.run();
             outTake.update();

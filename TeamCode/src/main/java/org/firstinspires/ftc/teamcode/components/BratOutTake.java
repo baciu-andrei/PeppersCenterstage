@@ -40,23 +40,28 @@ public class BratOutTake {
         telemetry = tele;
     }
     public boolean isActive, isRotated;
-    public void update(){
-        if(isActive){
-            rotate1.setPosition(activate_angle1);
-            rotate2.setPosition(activate_angle2);
+    public void update(double elevator_level){
 
-            align_backdrop.setPosition(parallel_backdrop);
-        } else {
-            rotate1.setPosition(deactivate_angle1);
-            rotate2.setPosition(deactivate_angle2);
+        if(elevator_level > 3.3) {
 
-            align_backdrop.setPosition(parallel_ground);
-        }
 
-        if(isRotated){
-            rotatePixels.setPosition(rotate_unit * 1 + rotation_adaos);
-        } else {
-            rotatePixels.setPosition(rotate_unit * 0);
+            if (isActive) {
+                rotate1.setPosition(activate_angle1);
+                rotate2.setPosition(activate_angle2);
+
+                align_backdrop.setPosition(parallel_backdrop);
+            } else {
+                rotate1.setPosition(deactivate_angle1);
+                rotate2.setPosition(deactivate_angle2);
+
+                align_backdrop.setPosition(parallel_ground);
+            }
+
+            if (isRotated) {
+                rotatePixels.setPosition(rotate_unit * 1 + rotation_adaos);
+            } else {
+                rotatePixels.setPosition(rotate_unit * 0);
+            }
         }
 
         rotate1.update();
