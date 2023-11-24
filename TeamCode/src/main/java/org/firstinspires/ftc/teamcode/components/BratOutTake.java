@@ -1,21 +1,21 @@
 package org.firstinspires.ftc.teamcode.components;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.CoolServo;
-import org.firstinspires.ftc.teamcode.utils.StickyGamepads;
 
 @Config
 public class BratOutTake {
     private final Servo rot1, rot2, al_b, rotp;
     private final CoolServo rotate1, rotate2, align_backdrop, rotatePixels;
 
-    public static double activate_angle = 0.75, deactivate_angle = 0, parallerl_backdrop = 0.2999, parallel_ground = 0;
-    public static double rotate_unit = 0.3, rotation_adaos = 0;
+    public static double parallel_backdrop = 0.2999, parallel_ground = 0;
+    public static double activate_angle1 = 0.75, activate_angle2 = 0.73,
+                            deactivate_angle1 = 0, deactivate_angle2 = 0.05;
+    public static double rotate_unit = 0.3, rotation_adaos = 0.03;
     private Telemetry telemetry;
 
 
@@ -42,13 +42,13 @@ public class BratOutTake {
     public boolean isActive, isRotated;
     public void update(){
         if(isActive){
-            rotate1.setPosition(activate_angle);
-            rotate2.setPosition(activate_angle);
+            rotate1.setPosition(activate_angle1);
+            rotate2.setPosition(activate_angle2);
 
-            align_backdrop.setPosition(parallerl_backdrop);
+            align_backdrop.setPosition(parallel_backdrop);
         } else {
-            rotate1.setPosition(deactivate_angle);
-            rotate2.setPosition(deactivate_angle);
+            rotate1.setPosition(deactivate_angle1);
+            rotate2.setPosition(deactivate_angle2);
 
             align_backdrop.setPosition(parallel_ground);
         }

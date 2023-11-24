@@ -63,6 +63,10 @@ public class Elevator{
 			gotoPos = -5;
 		}
 
+		if(lift_level == 0){
+			gotoPos = -5;
+		}
+
 		left.setTargetPosition(gotoPos);
 		right.setTargetPosition(gotoPos);
 
