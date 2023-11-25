@@ -99,7 +99,7 @@ public class Elevator{
 		if(right.getCurrentPosition() == gotoPos) STATE = LiftStates.STATIC;
 
 		if(lift_level == 0){
-			gotoPos = -5;
+			gotoPos = -2;
 		}
 
 		left.setTargetPosition(gotoPos);

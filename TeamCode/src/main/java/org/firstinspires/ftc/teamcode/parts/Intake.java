@@ -20,7 +20,7 @@ public class Intake {
     public int intake_level = 0;
     public static final int MAX_LEVELS = 5;
     private Telemetry tel;
-    public static double step_pos = 0.83/MAX_LEVELS;
+    public static double step_pos = 0.83/MAX_LEVELS, down_adding = 0;
 
     public Intake(HardwareMap hm, Gamepad gp1, Gamepad gp2, Telemetry tele){
         intakeMotor = hm.get(DcMotor.class, "Intake");
@@ -57,7 +57,7 @@ public class Intake {
         } else if(gamepad2.gamepad.right_trigger == 0) IntakeOn = false;
 
         if(IntakeOn){
-            intake_servo.setPosition(0 * step_pos);
+            intake_servo.setPosition(0 * step_pos + down_adding);
         } else {
             intake_servo.setPosition(intake_level * step_pos);
         }

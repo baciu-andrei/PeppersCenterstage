@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.utils.StickyGamepads;
 @Config
 public class Grippers {
     private final Servo claw1, claw2;
-    public static int ticks_trashhold = 5, ticks_for_sensor1 = 0, ticks_for_sensor2 = 0;
+    public static int ticks_trashhold = 7, ticks_for_sensor1 = 0, ticks_for_sensor2 = 0;
     public static double open_claw1 = 0, close_claw1 = 0.8,
                         open_claw2 = 0.07, close_claw2 = 0.8;
 

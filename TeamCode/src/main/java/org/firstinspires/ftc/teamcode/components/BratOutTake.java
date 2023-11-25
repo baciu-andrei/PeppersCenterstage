@@ -13,9 +13,9 @@ public class BratOutTake {
     private final CoolServo rotate1, rotate2, align_backdrop, rotatePixels;
 
     public static double parallel_backdrop = 0.2999, parallel_ground = 0;
-    public static double activate_angle1 = 0.75, activate_angle2 = 0.73,
+    public static double activate_angle1 = 0.75, activate_angle2 = 0.748,
                             deactivate_angle1 = 0, deactivate_angle2 = 0.05;
-    public static double rotate_unit = 0.3, rotation_adaos = 0.03;
+    public static double rotate_unit = 0.3, rotation_adaos = 0.03, rotation_adaos_inactive = 0;
     private Telemetry telemetry;
 
 
@@ -56,7 +56,7 @@ public class BratOutTake {
         if(isRotated){
             rotatePixels.setPosition(rotate_unit * 1 + rotation_adaos);
         } else {
-            rotatePixels.setPosition(rotate_unit * 0);
+            rotatePixels.setPosition(rotate_unit * 0 + rotation_adaos_inactive);
         }
 
         rotate1.update();
