@@ -22,6 +22,8 @@ public class Elevator{
 	private int lift_level;
 	public int gotoPos;
 	final private double CPR = 103.8, diametruSpool = 32, oneStep = fullExtend/11;
+	private double rightMotorPos, leftMotorPos,
+					rightVelocity, leftVelocity;
 
 	Telemetry telemetry;
 
@@ -55,6 +57,15 @@ public class Elevator{
 
 	public void loop(){
 
+		double d = right.getCurrentPosition();
+		rightVelocity = Math.abs(d - rightVelocity);
+		rightMotorPos = d;
+
+		d = left.getCurrentPosition();
+		leftVelocity = Math.abs(d - leftMotorPos);
+		leftMotorPos = d;
+
+
 		if(lift_level == 0){
 			gotoPos = -5;
 		}
@@ -69,10 +80,10 @@ public class Elevator{
 		left.setPower(1);
 		right.setPower(1);
 
-		if(right.getCurrentPosition() == gotoPos) STATE = LiftStates.STATIC;
+		if(rightMotorPos == gotoPos) STATE = LiftStates.STATIC;
 
 
-		telemetry.addData("right current position", right.getCurrentPosition());
+		telemetry.addData("right current position", rightMotorPos);
 		telemetry.addData("level", lift_level);
 		telemetry.addData("target position", gotoPos);
 
@@ -96,5 +107,5 @@ public class Elevator{
 	}
 
 	public int getLevel(){ return lift_level; }
-	public double getLevelNow(){ return right.getCurrentPosition()/oneStep; }
+	public double getLevelNow(){ return rightMotorPos/oneStep; }
 }

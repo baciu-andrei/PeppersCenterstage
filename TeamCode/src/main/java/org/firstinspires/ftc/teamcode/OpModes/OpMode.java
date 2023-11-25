@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -12,6 +13,8 @@ import org.firstinspires.ftc.teamcode.parts.DriveTrain;
 import org.firstinspires.ftc.teamcode.parts.Intake;
 import org.firstinspires.ftc.teamcode.parts.OutTake;
 import org.firstinspires.ftc.teamcode.utils.StickyGamepads;
+
+import java.util.List;
 
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "dionijos")
@@ -40,6 +43,13 @@ public class OpMode extends LinearOpMode {
 
         waitForStart();
         ElapsedTime freq = new ElapsedTime();
+
+        List<LynxModule> Hubs = hardwareMap.getAll(LynxModule.class);
+
+        for(LynxModule module : Hubs){
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+
         while(opModeIsActive() && !isStopRequested()) {
             freq.reset();
 
@@ -50,6 +60,10 @@ public class OpMode extends LinearOpMode {
             intake.loop();
 
             telemetry.addData("freq", (double)1/freq.seconds());
+
+            for(LynxModule module : Hubs){
+                module.clearBulkCache();
+            }
         }
     }
 }

@@ -64,7 +64,6 @@ public class Intake {
         if(IntakeOn) intakeMotor.setPower(0.8);
         else intakeMotor.setPower(0);
 
-        telemetry.addData("Motor Direction", intakeMotor.getDirection().toString());
 
     }
 }
