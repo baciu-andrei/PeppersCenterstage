@@ -86,7 +86,6 @@ public class Grippers {
 
         telemetry = tele;
 
-        update();
     }
 
     public void Drop1(){

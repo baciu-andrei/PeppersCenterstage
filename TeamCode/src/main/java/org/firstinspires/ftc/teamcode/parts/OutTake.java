@@ -41,6 +41,7 @@ public class OutTake {
         telemetry = tele;
         controls = c;
         STATE = STATES_OOUTTAKE.READY_FOR_PIXELS;
+        grippers.reset();
     }
 
     private void handleControls(){
@@ -81,6 +82,7 @@ public class OutTake {
             case SHOUD_RETRACT:
 
                 arm.deactivate();
+                arm.update();
                 STATES_OOUTTAKE.saved_level = elevator.getLevel();
                 elevator.setLevel(RetractLevel);
 
@@ -107,7 +109,7 @@ public class OutTake {
                 }
                 break;
             case WAIT_FOR_ELEVATOR_REST:
-                if(elevator.STATE == LiftStates.STATIC){
+                if(elevator.getLevelNow() == STATES_OOUTTAKE.pos){
                     if(STATES_OOUTTAKE.pos == RetractLevel) {
                         STATE = STATES_OOUTTAKE.WAIT_FOR_ARM_REST;
                     } else if(STATES_OOUTTAKE.pos == 0){
@@ -129,7 +131,7 @@ public class OutTake {
 
         handleControls();
 
-        arm.update(elevator.getLevelNow());
+        arm.update();
         grippers.update();
         elevator.loop();
 

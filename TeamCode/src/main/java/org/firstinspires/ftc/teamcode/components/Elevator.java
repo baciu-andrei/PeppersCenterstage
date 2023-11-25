@@ -80,7 +80,7 @@ public class Elevator{
 		left.setPower(1);
 		right.setPower(1);
 
-		if(rightMotorPos == gotoPos) STATE = LiftStates.STATIC;
+		if(rightMotorPos == gotoPos || leftMotorPos == gotoPos) STATE = LiftStates.STATIC;
 
 
 		telemetry.addData("right current position", rightMotorPos);
@@ -107,5 +107,5 @@ public class Elevator{
 	}
 
 	public int getLevel(){ return lift_level; }
-	public double getLevelNow(){ return rightMotorPos/oneStep; }
+	public double getLevelNow(){ return right.getCurrentPosition()/oneStep; }
 }

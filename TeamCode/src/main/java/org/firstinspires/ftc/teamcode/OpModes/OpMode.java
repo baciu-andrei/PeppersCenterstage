@@ -47,7 +47,7 @@ public class OpMode extends LinearOpMode {
         List<LynxModule> Hubs = hardwareMap.getAll(LynxModule.class);
 
         for(LynxModule module : Hubs){
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.OFF);
         }
 
         while(opModeIsActive() && !isStopRequested()) {
@@ -60,10 +60,6 @@ public class OpMode extends LinearOpMode {
             intake.loop();
 
             telemetry.addData("freq", (double)1/freq.seconds());
-
-            for(LynxModule module : Hubs){
-                module.clearBulkCache();
-            }
         }
     }
 }

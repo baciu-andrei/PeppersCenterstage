@@ -31,6 +31,8 @@ public class Controls {
         dropPilex2          = false;
         feedForward         = false;
         rotatePixels        = false;
+        Intake              = false;
+        reverseIntake       = false;
     }
 
     public void update(){ // deocamdata hard coded
