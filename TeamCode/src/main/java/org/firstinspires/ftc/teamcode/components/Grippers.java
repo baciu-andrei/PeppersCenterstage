@@ -24,7 +24,7 @@ public class Grippers {
 
     public static double open_claw1 = 0, close_claw1 = 0.8,
                         open_claw2 = 0.07, close_claw2 = 0.8;
-    public static double trashhold_back = 15, trashhold_front = 15;
+    public static double trashhold_back = 14, trashhold_front = 14;
     public static boolean ActivateAutomatic = true;
 
     public void update(){
@@ -32,8 +32,7 @@ public class Grippers {
         double frontDistance = front_sensor.getDistance(DistanceUnit.MM);
 
         if(ActivateAutomatic){
-            if(!STATE.claw1Active &&
-               backDistance >= trashhold_back){
+            if(backDistance <= trashhold_back){
 
                 backSensorUpdater.update();
 
@@ -41,15 +40,17 @@ public class Grippers {
                 backSensorUpdater.reset();
             }
 
-            if(STATE.claw1Active &&
-               !STATE.claw2Active &&
-               frontDistance >= trashhold_front){
+            if(backSensorUpdater.getState() && frontDistance <= trashhold_front){
 
                 frontSensorUpdater.update();
 
             } else {
                 frontSensorUpdater.reset();
             }
+
+            if(backSensorUpdater.getState()) STATE.claw1Active = true;
+
+            if(frontSensorUpdater.getState()) STATE.claw2Active = true;
 
             STATE.claw1Active = backSensorUpdater.getState();
             STATE.claw2Active = frontSensorUpdater.getState();
@@ -64,6 +65,10 @@ public class Grippers {
 
         telemetry.addData("sensor read1", backDistance);
         telemetry.addData("sensor read2", frontDistance);
+        telemetry.addData("claw1", backSensorUpdater.getTicks());
+        telemetry.addData("claw2", frontSensorUpdater.getTicks());
+        telemetry.addData("boolc1", STATE.claw1Active);
+        telemetry.addData("boolc2", STATE.claw2Active);
 
     }
     public Grippers(HardwareMap hm, Telemetry tele){
@@ -73,8 +78,8 @@ public class Grippers {
         back_sensor = hm.get(RevColorSensorV3.class, "back_sensor");
         front_sensor = hm.get(RevColorSensorV3.class, "front_sensor");
 
-        frontSensorUpdater = new MultiTickUpdater(15);
-        backSensorUpdater = new MultiTickUpdater(15);
+        frontSensorUpdater = new MultiTickUpdater(7);
+        backSensorUpdater = new MultiTickUpdater(7);
 
         STATE = new STATES();
 

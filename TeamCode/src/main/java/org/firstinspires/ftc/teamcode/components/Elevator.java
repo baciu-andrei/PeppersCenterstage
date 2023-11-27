@@ -66,13 +66,13 @@ public class Elevator{
 		leftMotorPos = d;
 
 
-		if(lift_level == 0){
-			gotoPos = -5;
-		}
-
-		if(lift_level == 0){
-			gotoPos = -5;
-		}
+//		if(lift_level == 0){
+//			gotoPos = -3;
+//		}
+//
+//		if(lift_level == 0){
+//			gotoPos = -3;
+//		}
 
 		left.setTargetPosition(gotoPos);
 		right.setTargetPosition(gotoPos);
@@ -84,6 +84,7 @@ public class Elevator{
 
 
 		telemetry.addData("right current position", rightMotorPos);
+		telemetry.addData("left target pos", leftMotorPos);
 		telemetry.addData("level", lift_level);
 		telemetry.addData("target position", gotoPos);
 

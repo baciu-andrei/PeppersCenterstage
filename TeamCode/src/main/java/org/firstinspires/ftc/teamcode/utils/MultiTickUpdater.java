@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.utils;
 
 public class MultiTickUpdater {
-    private static int MaxTrashHold;
+    private int MaxTrashHold;
     private int ticks_passed;
     public MultiTickUpdater(int maxTrashHold){
         MaxTrashHold = maxTrashHold;
@@ -9,7 +9,8 @@ public class MultiTickUpdater {
     }
 
     public void update(){
-        ++ ticks_passed;
+        if(ticks_passed <= MaxTrashHold + 3)
+            ++ ticks_passed;
     }
     public void reset(){
         ticks_passed = 0;
@@ -18,4 +19,5 @@ public class MultiTickUpdater {
     public boolean getState(){
         return ticks_passed >= MaxTrashHold;
     }
+    public int getTicks(){return ticks_passed;}
 }

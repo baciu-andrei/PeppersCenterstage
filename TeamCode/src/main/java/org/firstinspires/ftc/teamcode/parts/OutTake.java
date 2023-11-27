@@ -109,7 +109,8 @@ public class OutTake {
                 }
                 break;
             case WAIT_FOR_ELEVATOR_REST:
-                if(elevator.getLevelNow() == STATES_OOUTTAKE.pos){
+                if(elevator.getLevelNow() <= STATES_OOUTTAKE.pos + 0.1 &&
+                    elevator.getLevelNow() >= STATES_OOUTTAKE.pos - 0.1){
                     if(STATES_OOUTTAKE.pos == RetractLevel) {
                         STATE = STATES_OOUTTAKE.WAIT_FOR_ARM_REST;
                     } else if(STATES_OOUTTAKE.pos == 0){
@@ -125,7 +126,7 @@ public class OutTake {
                 break;
         }
 
-        if(elevator.getLevelNow() != 0){
+        if(elevator.getLevelNow() > 0.3){
             grippers.dezactivateAuto();
         } else grippers.reset();
 
@@ -134,6 +135,8 @@ public class OutTake {
         arm.update();
         grippers.update();
         elevator.loop();
-
+        telemetry.addData("Out take state", STATE.toString());
+        telemetry.addData("level now", elevator.getLevelNow());
+        telemetry.addData("shoud go to", STATES_OOUTTAKE.pos);
     }
 }

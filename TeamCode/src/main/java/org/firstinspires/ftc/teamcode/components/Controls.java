@@ -79,4 +79,46 @@ public class Controls {
         gamepad2.update();
     }
 
+    public void onlyp1(){
+        reset();
+        if(gamepad1.right_bumper){
+            dropPixel1 = true;
+        }
+        if(gamepad1.left_bumper) {
+            dropPilex2 = true;
+        }
+
+        if(gamepad1.dpad_up){
+            stepElevtorUp = true;
+        }
+        if(gamepad1.dpad_down){
+            stepElevatorDown = true;
+        }
+        if(gamepad1.dpad_right) {
+            extendElevator = true;
+        }
+        if(gamepad1.dpad_left){
+            retractElevtor = true;
+        }
+
+        if(gamepad1.y){
+            Intake = true;
+        }
+        if(gamepad1.x){
+            reverseIntake = true;
+        }
+
+        if(gamepad1.b){
+            rotatePixels = true;
+        }
+
+        if(gamepad2.x){
+            feedForward = true;
+        }
+
+        gamepad1.update();
+        gamepad2.update();
+
+    }
+
 }

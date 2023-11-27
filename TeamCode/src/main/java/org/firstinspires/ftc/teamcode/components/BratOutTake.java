@@ -14,7 +14,7 @@ public class BratOutTake {
 
     public static double parallel_backdrop = 0.2999, parallel_ground = 0;
     public static double activate_angle1 = 0.75, activate_angle2 = 0.73,
-                            deactivate_angle1 = 0, deactivate_angle2 = 0.05;
+                            deactivate_angle1 = 0, deactivate_angle2 = 0.02;
     public static double rotate_unit = 0.3, rotation_adaos = 0.03;
     private Telemetry telemetry;
 
@@ -31,8 +31,8 @@ public class BratOutTake {
         align_backdrop = new CoolServo(al_b, true,16, 15, 0);
         rotatePixels = new CoolServo(rotp, true, 20, 12,0);
 
-        rotate1.setPosition(0);
-        rotate2.setPosition(0);
+        rotate1.setPosition(deactivate_angle1);
+        rotate2.setPosition(deactivate_angle2);
 
         align_backdrop.setPosition(0);
         rotatePixels.setPosition(0);
