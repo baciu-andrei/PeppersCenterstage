@@ -5,11 +5,10 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.components.BratOutTake;
+import org.firstinspires.ftc.teamcode.components.Controls;
 import org.firstinspires.ftc.teamcode.components.Elevator;
 import org.firstinspires.ftc.teamcode.components.Grippers;
-import org.firstinspires.ftc.teamcode.utils.StickyGamepads;
 import org.firstinspires.ftc.teamcode.components.LiftStates;
 
 @Config
@@ -23,55 +22,98 @@ public class OutTake {
         READY_FOR_PIXELS;
 
         public static int pos = 0;
+        public static int saved_level = 0;
     }
-
-    ;
-    STATES_OOUTTAKE STATE;
+    private STATES_OOUTTAKE STATE;
     private final Elevator elevator;
     private final BratOutTake arm;
     private final Grippers grippers;
     private Telemetry telemetry;
 
-    private StickyGamepads gamepad1, gamepad2;
-
     public int RetractLevel = 4;
-    public OutTake(HardwareMap hm, Gamepad gp1, Gamepad gp2, Telemetry tele){
-        elevator = new Elevator(hm, gp1, gp2, tele);
+
+    private Controls controls;
+    public OutTake(HardwareMap hm, Controls c, Telemetry tele){
+        elevator = new Elevator(hm, tele);
         arm = new BratOutTake(hm, tele);
         grippers = new Grippers(hm, tele);
 
         telemetry = tele;
+        controls = c;
         STATE = STATES_OOUTTAKE.READY_FOR_PIXELS;
+        grippers.reset();
+    }
 
-        gamepad1 = new StickyGamepads(gp1);
-        gamepad2 = new StickyGamepads(gp2);
+    private void handleControls(){
+
+        ///////// ELEVATOR /////////
+        if(controls.retractElevtor && elevator.getLevelNow() > 0){
+            STATE = STATES_OOUTTAKE.SHOUD_RETRACT;
+            grippers.reset();
+        }
+        if(controls.extendElevator){
+            elevator.setLevel(STATES_OOUTTAKE.saved_level);
+        }
+        if(controls.stepElevtorUp){
+            elevator.setLevel(elevator.getLevel() + 1);
+        }
+        if(controls.stepElevatorDown){
+            elevator.setLevel(elevator.getLevel() - 1);
+        }
+
+        ///////// ARM ///////////
+        if(controls.rotatePixels){
+            if(arm.isRotated) arm.antiRotate90();
+            else arm.rotate90();
+        }
+
+        //////// CLAW //////////
+        if(controls.dropPixel1){
+            grippers.Drop1();
+        }
+        if(controls.dropPilex2){
+            grippers.Drop2();
+        }
+        if(controls.pixelFail){
+            grippers.reset();
+        }
 
     }
 
-    public void loop(){
-
+    public void update(){
         switch (STATE){
             case SHOUD_RETRACT:
-                elevator.setLevel(RetractLevel);
+
                 arm.deactivate();
+                arm.update();
+                STATES_OOUTTAKE.saved_level = elevator.getLevel();
+                elevator.setLevel(RetractLevel);
+
                 STATE = STATES_OOUTTAKE.WAIT_FOR_ELEVATOR_REST;
                 STATES_OOUTTAKE.pos = RetractLevel;
+
                 break;
+
             case RESET_ELEVATOR:
+
                 STATE = STATES_OOUTTAKE.WAIT_FOR_ELEVATOR_REST;
                 STATES_OOUTTAKE.pos = 0;
                 elevator.setLevel(0);
+
                 break;
             case SET_FEED_FORWARD:
-                // TODO
+                // TODO:
+
                 break;
+
             case WAIT_FOR_ARM_REST:
                 if(arm.isAtRest()){
                     STATE = STATES_OOUTTAKE.RESET_ELEVATOR;
                 }
                 break;
             case WAIT_FOR_ELEVATOR_REST:
-                if(elevator.getLevelNow() == STATES_OOUTTAKE.pos){
+                if(elevator.getLevelNow() <= STATES_OOUTTAKE.pos + 0.1 &&
+                    elevator.getLevelNow() >= STATES_OOUTTAKE.pos - 0.1){
                     if(STATES_OOUTTAKE.pos == RetractLevel) {
                         STATE = STATES_OOUTTAKE.WAIT_FOR_ARM_REST;
                     } else if(STATES_OOUTTAKE.pos == 0){
@@ -79,39 +121,25 @@ public class OutTake {
                     }
                 }
                 break;
+            case READY_FOR_PIXELS:
+                if(elevator.getLevelNow() > 3.3){
+                    arm.activate();
+                    arm.rotate90();
+                }
+                break;
         }
 
-        if(elevator.getLevel() != 0){
+        if(elevator.getLevelNow() > 1.2){
             grippers.dezactivateAuto();
-        } else grippers.activateAuto();
+        } else grippers.reset();
 
-        if(elevator.getLevelNow() >= 3 && elevator.STATE == LiftStates.GO_UP && STATE != STATES_OOUTTAKE.SHOUD_RETRACT){
-            arm.activate();
-            arm.rotate90();
-        }
-
-        if(gamepad2.y && elevator.getLevelNow() > 0){
-            STATE = STATES_OOUTTAKE.SHOUD_RETRACT;
-            grippers.reset();
-        }
-
-        if(gamepad2.b){
-            if(arm.isRotated) arm.antiRotate90();
-            else arm.rotate90();
-        }
-
-        if(gamepad1.right_bumper){
-            grippers.reset_claw_1();
-        }
-        if(gamepad1.left_bumper){
-            grippers.reset_claw_2();
-        }
-
+        handleControls();
 
         arm.update();
         grippers.update();
         elevator.loop();
-        gamepad2.update();
-        gamepad1.update();
+        telemetry.addData("Out take state", STATE.toString());
+        telemetry.addData("level now", elevator.getLevelNow());
+        telemetry.addData("shoud go to", STATES_OOUTTAKE.pos);
     }
 }

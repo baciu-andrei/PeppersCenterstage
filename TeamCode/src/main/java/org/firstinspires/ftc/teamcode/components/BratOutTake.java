@@ -31,8 +31,8 @@ public class BratOutTake {
         align_backdrop = new CoolServo(al_b, true,16, 15, 0);
         rotatePixels = new CoolServo(rotp, true, 20, 12,0);
 
-        rotate1.setPosition(0);
-        rotate2.setPosition(0);
+        rotate1.setPosition(deactivate_angle1);
+        rotate2.setPosition(deactivate_angle2);
 
         align_backdrop.setPosition(0);
         rotatePixels.setPosition(0);
@@ -41,7 +41,7 @@ public class BratOutTake {
     }
     public boolean isActive, isRotated;
     public void update(){
-        if(isActive){
+        if (isActive) {
             rotate1.setPosition(activate_angle1);
             rotate2.setPosition(activate_angle2);
 
@@ -53,7 +53,7 @@ public class BratOutTake {
             align_backdrop.setPosition(parallel_ground);
         }
 
-        if(isRotated){
+        if (isRotated) {
             rotatePixels.setPosition(rotate_unit * 1 + rotation_adaos);
         } else {
             rotatePixels.setPosition(rotate_unit * 0 + rotation_adaos_inactive);
