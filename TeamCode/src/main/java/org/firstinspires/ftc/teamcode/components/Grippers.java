@@ -52,8 +52,6 @@ public class Grippers {
 
             if(frontSensorUpdater.getState()) STATE.claw2Active = true;
 
-            STATE.claw1Active = backSensorUpdater.getState();
-            STATE.claw2Active = frontSensorUpdater.getState();
         }
 
         if(STATE.claw1Active) claw1.setPosition(close_claw1);

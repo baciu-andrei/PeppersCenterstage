@@ -54,7 +54,7 @@ public class CoolMotor {
         this.runMode = runMode;
     }
 
-    private double power;
+    public double power;
 
     public void setPower(double power){
         if(runMode == RunMode.PID) return;

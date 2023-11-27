@@ -1,13 +1,16 @@
 package org.firstinspires.ftc.teamcode.components;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.AMP;
 import org.firstinspires.ftc.teamcode.utils.CoolMotor;
@@ -17,30 +20,29 @@ public class Elevator{
 
 	public LiftStates STATE;
 
-	final private DcMotor left, right;
-	final private double fullExtend = (int)(950);
-	private int lift_level;
-	public int gotoPos;
-	final private double CPR = 103.8, diametruSpool = 32, oneStep = fullExtend/11;
-	private double rightMotorPos, leftMotorPos,
-					rightVelocity, leftVelocity;
+	final private DcMotorEx left, right;
+
+	private static final double CPR = 145.1, diametruSpool = 32;
+	public static final double fullExtend = 950;
+	public static final double oneStep = fullExtend/11;
+	private int level = 0;
+	private double gotoPos = 0, rightMotorPos = 0, leftMotorPos = 0;
 
 	Telemetry telemetry;
 
 	public Elevator(HardwareMap hardwareMap, Telemetry tel){
-		left = hardwareMap.get(DcMotor.class, "ll");
-		right = hardwareMap.get(DcMotor.class, "lr");
+		left = hardwareMap.get(DcMotorEx.class, "ll");
+		right = hardwareMap.get(DcMotorEx.class, "lr");
 
-		left.setDirection(DcMotorSimple.Direction.REVERSE);
+		left.setDirection(DcMotorEx.Direction.REVERSE);
 
 		left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-		right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
 		left.setTargetPosition(0);
+		right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		right.setTargetPosition(0);
+
+		left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 		left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -48,65 +50,58 @@ public class Elevator{
 		left.setPower(1);
 		right.setPower(1);
 
-
 		telemetry = tel;
-
-		STATE = LiftStates.STATIC;
 
 	}
 
 	public void loop(){
 
-		double d = right.getCurrentPosition();
-		rightVelocity = Math.abs(d - rightVelocity);
-		rightMotorPos = d;
+		rightMotorPos = right.getCurrentPosition();
+		leftMotorPos = left.getCurrentPosition();
 
-		d = left.getCurrentPosition();
-		leftVelocity = Math.abs(d - leftMotorPos);
-		leftMotorPos = d;
+		if(gotoPos == 0){
+			gotoPos = -2;
+		}
 
-
-//		if(lift_level == 0){
-//			gotoPos = -3;
-//		}
-//
-//		if(lift_level == 0){
-//			gotoPos = -3;
-//		}
-
-		left.setTargetPosition(gotoPos);
-		right.setTargetPosition(gotoPos);
+		left.setTargetPosition((int)gotoPos);
+		right.setTargetPosition((int)gotoPos);
 
 		left.setPower(1);
 		right.setPower(1);
 
-		if(rightMotorPos == gotoPos || leftMotorPos == gotoPos) STATE = LiftStates.STATIC;
-
 
 		telemetry.addData("right current position", rightMotorPos);
-		telemetry.addData("left target pos", leftMotorPos);
-		telemetry.addData("level", lift_level);
+		telemetry.addData("left current position", leftMotorPos);
+		telemetry.addData("level", level);
 		telemetry.addData("target position", gotoPos);
+
 
 		telemetry.update();
 	}
 
-	public void setLevel(int level){
-		int level_corrected;
+	public int getLevel(){
+		return level;
+	}
 
-		if(level < 0) level_corrected = 0;
-		else if(level > 11) level_corrected = 11;
-		else level_corrected = level;
+	public void setLevel(int lvl){
+		int correctedLevel;
+		if(lvl > 11) correctedLevel = 11;
+		else if(lvl < 0) correctedLevel = 0;
+		else correctedLevel = lvl;
 
-		if(level_corrected > lift_level) STATE= LiftStates.GO_UP;
-		else if(level_corrected < lift_level) STATE = LiftStates.GO_DOWN;
-		else STATE= LiftStates.STATIC;
-		lift_level = level_corrected;
+		if(correctedLevel > level) STATE = LiftStates.GO_UP;
+		else if(correctedLevel < level) STATE = LiftStates.GO_DOWN;
+		else STATE = LiftStates.STATIC;
 
-		gotoPos = (int) (lift_level*oneStep * CPR / (Math.PI * diametruSpool));
+		gotoPos = (double)(correctedLevel * oneStep);
+
+		level = correctedLevel;
 
 	}
 
-	public int getLevel(){ return lift_level; }
-	public double getLevelNow(){ return right.getCurrentPosition()/oneStep; }
+	public double getLevelNow(){
+		return (double)rightMotorPos/oneStep;
+	}
+
+
 }

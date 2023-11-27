@@ -74,6 +74,9 @@ public class OutTake {
         if(controls.dropPilex2){
             grippers.Drop2();
         }
+        if(controls.pixelFail){
+            grippers.reset();
+        }
 
     }
 
@@ -126,7 +129,7 @@ public class OutTake {
                 break;
         }
 
-        if(elevator.getLevelNow() > 0.3){
+        if(elevator.getLevelNow() > 1.2){
             grippers.dezactivateAuto();
         } else grippers.reset();
 

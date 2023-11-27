@@ -13,7 +13,7 @@ public class Controls {
                     dropPixel1, dropPilex2,
                     rotatePixels,
                     Intake, reverseIntake,
-                    feedForward;
+                    feedForward, pixelFail;
 
     private StickyGamepads gamepad1, gamepad2;
 
@@ -33,6 +33,7 @@ public class Controls {
         rotatePixels        = false;
         Intake              = false;
         reverseIntake       = false;
+        pixelFail           = false;
     }
 
     public void update(){ // deocamdata hard coded
@@ -72,6 +73,9 @@ public class Controls {
 
         if(gamepad2.x){
             feedForward = true;
+        }
+        if(gamepad2.y){
+            pixelFail = true;
         }
 
 

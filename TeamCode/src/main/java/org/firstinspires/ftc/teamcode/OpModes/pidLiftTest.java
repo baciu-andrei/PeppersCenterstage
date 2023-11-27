@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,11 +12,17 @@ import org.firstinspires.ftc.teamcode.components.Controls;
 import org.firstinspires.ftc.teamcode.components.Elevator;
 
 @TeleOp(name = "lift tuning")
+@Config
 public class pidLiftTest extends LinearOpMode {
-    Elevator lift;
+    public static Elevator lift;
     Controls controls;
+    FtcDashboard dash;
     @Override
     public void runOpMode() throws InterruptedException{
+
+        dash = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
+
         lift = new Elevator(hardwareMap, telemetry);
         controls = new Controls(gamepad1, gamepad2);
 
