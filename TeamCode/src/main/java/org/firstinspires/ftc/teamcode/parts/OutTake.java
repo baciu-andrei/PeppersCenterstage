@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.components.Controls;
 import org.firstinspires.ftc.teamcode.components.Elevator;
 import org.firstinspires.ftc.teamcode.components.Grippers;
 import org.firstinspires.ftc.teamcode.components.LiftStates;
+import org.firstinspires.ftc.teamcode.utils.MultiTickUpdater;
 
 @Config
 public class OutTake {
@@ -19,7 +20,8 @@ public class OutTake {
         SHOUD_RETRACT,
         WAIT_FOR_ARM_REST,
         WAIT_FOR_ELEVATOR_REST,
-        READY_FOR_PIXELS;
+        READY_FOR_PIXELS,
+        FEED;
 
         public static int pos = 0;
         public static int saved_level = 0;
@@ -29,8 +31,9 @@ public class OutTake {
     private final BratOutTake arm;
     private final Grippers grippers;
     private Telemetry telemetry;
+    private MultiTickUpdater feedUpdater;
 
-    public int RetractLevel = 4;
+    public int RetractLevel = 4, FeedForwardPos = 5, stallPixels = 2;
 
     private Controls controls;
     public OutTake(HardwareMap hm, Controls c, Telemetry tele){
@@ -42,6 +45,7 @@ public class OutTake {
         controls = c;
         STATE = STATES_OOUTTAKE.READY_FOR_PIXELS;
         grippers.reset();
+        feedUpdater = new MultiTickUpdater(10);
     }
 
     private void handleControls(){
@@ -65,6 +69,9 @@ public class OutTake {
         if(controls.rotatePixels){
             if(arm.isRotated) arm.antiRotate90();
             else arm.rotate90();
+        }
+        if(controls.feedForward){
+            STATE = STATES_OOUTTAKE.SET_FEED_FORWARD;
         }
 
         //////// CLAW //////////
@@ -103,7 +110,18 @@ public class OutTake {
                 break;
             case SET_FEED_FORWARD:
                 // TODO:
-
+                elevator.setLevel(FeedForwardPos);
+                STATES_OOUTTAKE.pos = FeedForwardPos;
+                STATE = STATES_OOUTTAKE.WAIT_FOR_ELEVATOR_REST;
+                break;
+            case FEED:
+                if(arm.isAtRest() && feedUpdater.getState()){
+                    STATE = STATES_OOUTTAKE.WAIT_FOR_ELEVATOR_REST;
+                    elevator.setLevel(stallPixels);
+                    STATES_OOUTTAKE.pos = stallPixels;
+                    feedUpdater.reset();
+                }
+                feedUpdater.update();
                 break;
 
             case WAIT_FOR_ARM_REST:
@@ -118,6 +136,14 @@ public class OutTake {
                         STATE = STATES_OOUTTAKE.WAIT_FOR_ARM_REST;
                     } else if(STATES_OOUTTAKE.pos == 0){
                         STATE = STATES_OOUTTAKE.READY_FOR_PIXELS;
+                    } else if(STATES_OOUTTAKE.pos == FeedForwardPos){
+                        arm.setFeedPos();
+                        STATE = STATES_OOUTTAKE.FEED;
+                    } else if(STATES_OOUTTAKE.pos == stallPixels){
+                        grippers.Drop1();
+                        grippers.Drop2();
+                        elevator.setLevel(RetractLevel);
+                        STATE = STATES_OOUTTAKE.SHOUD_RETRACT;
                     }
                 }
                 break;
@@ -129,9 +155,9 @@ public class OutTake {
                 break;
         }
 
-        if(elevator.getLevelNow() > 1.2){
+        if(elevator.getLevelNow() > 0.03){
             grippers.dezactivateAuto();
-        } else grippers.reset();
+        } else grippers.ActivateAuto();
 
         handleControls();
 
@@ -139,6 +165,7 @@ public class OutTake {
         grippers.update();
         elevator.loop();
         telemetry.addData("Out take state", STATE.toString());
+        telemetry.addData("state pos stalling", STATES_OOUTTAKE.pos);
         telemetry.addData("level now", elevator.getLevelNow());
         telemetry.addData("shoud go to", STATES_OOUTTAKE.pos);
     }

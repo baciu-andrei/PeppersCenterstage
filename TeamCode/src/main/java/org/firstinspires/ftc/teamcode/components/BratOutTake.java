@@ -13,8 +13,9 @@ public class BratOutTake {
     private final CoolServo rotate1, rotate2, align_backdrop, rotatePixels;
 
     public static double parallel_backdrop = 0.2999, parallel_ground = 0;
-    public static double activate_angle1 = 0.75, activate_angle2 = 0.748,
-                            deactivate_angle1 = 0, deactivate_angle2 = 0.05;
+    public static double activate_angle1 = 1, activate_angle2 = 1,
+                            deactivate_angle1 = 0.35, deactivate_angle2 = 0.35,
+                            feed1 = 0, feed2 = 0;
     public static double rotate_unit = 0.3, rotation_adaos = 0.03, rotation_adaos_inactive = 0;
     private Telemetry telemetry;
 
@@ -39,18 +40,23 @@ public class BratOutTake {
 
         telemetry = tele;
     }
-    public boolean isActive, isRotated;
+    public boolean isActive, isRotated, feedIsOn;
     public void update(){
-        if (isActive) {
-            rotate1.setPosition(activate_angle1);
-            rotate2.setPosition(activate_angle2);
-
-            align_backdrop.setPosition(parallel_backdrop);
+        if(feedIsOn) {
+            rotate1.setPosition(feed1);
+            rotate2.setPosition(feed2);
         } else {
-            rotate1.setPosition(deactivate_angle1);
-            rotate2.setPosition(deactivate_angle2);
+            if (isActive) {
+                rotate1.setPosition(activate_angle1);
+                rotate2.setPosition(activate_angle2);
 
-            align_backdrop.setPosition(parallel_ground);
+                align_backdrop.setPosition(parallel_backdrop);
+            } else {
+                rotate1.setPosition(deactivate_angle1);
+                rotate2.setPosition(deactivate_angle2);
+
+                align_backdrop.setPosition(parallel_ground);
+            }
         }
 
         if (isRotated) {
@@ -68,9 +74,11 @@ public class BratOutTake {
 
     public void activate(){
         isActive = true;
+        feedIsOn = false;
     }
     public void deactivate(){
         isActive = false; isRotated = false;
+        feedIsOn = false;
     }
 
     public void rotate90(){ isRotated = true; }
@@ -80,6 +88,15 @@ public class BratOutTake {
     public boolean isAtRest(){
         return rotate1.getTimeToMotionEnd() == 0 && rotate2.getTimeToMotionEnd() == 0 && rotatePixels.getTimeToMotionEnd() == 0 &&
                 align_backdrop.getTimeToMotionEnd() == 0;
+    }
+
+    public void setFeedPos(){
+        feedIsOn = true;
+        isActive = false;
+        isRotated = false;
+    }
+    public boolean getFeedPos(){
+        return feedIsOn;
     }
 
 }

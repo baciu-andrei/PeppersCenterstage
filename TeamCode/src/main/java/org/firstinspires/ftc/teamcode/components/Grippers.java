@@ -23,7 +23,7 @@ public class Grippers {
     private final Servo claw1, claw2;
     public static double open_claw1 = 0, close_claw1 = 0.8,
                         open_claw2 = 0.07, close_claw2 = 0.8;
-    public static double trashhold_back = 14, trashhold_front = 14;
+    public static double trashhold_back = 19, trashhold_front = 19;
     public static boolean ActivateAutomatic = true;
 
     public void update(){
@@ -39,7 +39,7 @@ public class Grippers {
                 backSensorUpdater.reset();
             }
 
-            if(backSensorUpdater.getState() && frontDistance <= trashhold_front){
+            if(STATE.claw1Active && frontDistance <= trashhold_front){
 
                 frontSensorUpdater.update();
 
@@ -101,6 +101,7 @@ public class Grippers {
         STATE.claw2Active = false;
         ActivateAutomatic = true;
     }
+    public void ActivateAuto(){ ActivateAutomatic = true; }
     public void dezactivateAuto(){
         ActivateAutomatic = false;
     }
