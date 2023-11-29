@@ -75,7 +75,7 @@ public class Elevator{
 		liftDirection = LiftDirection.NORMAL;
 
 	}
-	public void loop(){
+	public void update_values(){
 		double d = rightMotorPos;
 		rightMotorPos = right.getCurrentPosition();
 		speedRight = Math.abs(d - rightMotorPos);
@@ -83,6 +83,8 @@ public class Elevator{
 		d = leftMotorPos;
 		leftMotorPos = left.getCurrentPosition();
 		speedLeft = Math.abs(d - leftMotorPos);
+	}
+	public void loop(){
 
 		switch (liftDirection){
 			case NORMAL:

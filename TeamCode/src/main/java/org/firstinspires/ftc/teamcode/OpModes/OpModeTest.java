@@ -5,41 +5,49 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.components.BratOutTake;
+import org.firstinspires.ftc.teamcode.components.Grippers;
 import org.firstinspires.ftc.teamcode.components.Hanger;
 import org.firstinspires.ftc.teamcode.utils.StickyGamepads;
 
 @TeleOp(name = "test hang")
 @Config
 public class OpModeTest extends LinearOpMode {
-    public static Hanger hanger;
-    public int pos = 1;
-    private StickyGamepads gp2;
-    private BratOutTake arm;
+
     @Override
     public void runOpMode() throws InterruptedException{
         FtcDashboard dash = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
-        arm = new BratOutTake(hardwareMap, telemetry);
-        gp2 = new StickyGamepads(gamepad2);
+        StickyGamepads gp = new StickyGamepads(gamepad2);
+        Grippers grippers = new Grippers(hardwareMap, telemetry);
 
+        DcMotorEx dcMotorEx = hardwareMap.get(DcMotorEx.class, "Hang Motor");
+        dcMotorEx.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        dcMotorEx.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
-//        hanger.STOP = true;
+        grippers.dezactivateAuto();
+        boolean var = true;
         while(opModeIsActive() && !isStopRequested()){
-            if(gp2.x){
-                arm.activate();
+//            if(gp.x){
+//                grippers.Drop1();
+//                grippers.Drop2();
+//            }
+//            if(gp.a){
+//                grippers.activate();
+//            }
+            dcMotorEx.setPower(0);
+            if(gamepad2.a){
+                dcMotorEx.setPower(1);
             }
-            if(gp2.y){
-                arm.deactivate();
+            if(gamepad2.b){
+                dcMotorEx.setPower(-1);
             }
-            if(gp2.a){
-                arm.setFeedPos();
-            }
-            arm.update();
-            gp2.update();
+
+            telemetry.addData("pos", dcMotorEx.getCurrentPosition());
             telemetry.update();
         }
     }

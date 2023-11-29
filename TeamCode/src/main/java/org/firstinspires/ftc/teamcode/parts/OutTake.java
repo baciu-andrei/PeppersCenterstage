@@ -88,6 +88,8 @@ public class OutTake {
     }
 
     public void update(){
+        elevator.update_values();
+        grippers.update_values();
         switch (STATE){
             case SHOUD_RETRACT:
 

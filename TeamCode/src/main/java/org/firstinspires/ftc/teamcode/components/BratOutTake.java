@@ -9,6 +9,12 @@ import org.firstinspires.ftc.teamcode.utils.CoolServo;
 
 @Config
 public class BratOutTake {
+    public enum ArmStates{
+        READY_FOR_PIXELS,
+        TO_BACKDROP,
+        FEED
+    };
+    ArmStates STATE;
     private final Servo rot1, rot2, al_b, rotp;
     private final CoolServo rotate1, rotate2, align_backdrop, rotatePixels;
 
@@ -16,7 +22,8 @@ public class BratOutTake {
     public static double activate_angle1 = 1, activate_angle2 = 1,
                             deactivate_angle1 = 0.35, deactivate_angle2 = 0.35,
                             feed1 = 0, feed2 = 0;
-    public static double rotate_unit = 0.3, rotation_adaos = 0.03, rotation_adaos_inactive = 0;
+    public static double rotate_unit = 0.33, rotation_to_feed = 0.3;
+    public int rotate = 0;
     private Telemetry telemetry;
 
 
@@ -32,6 +39,8 @@ public class BratOutTake {
         align_backdrop = new CoolServo(al_b, true,16, 15, 0);
         rotatePixels = new CoolServo(rotp, true, 20, 12,0);
 
+        STATE = ArmStates.READY_FOR_PIXELS;
+
         rotate1.setPosition(deactivate_angle1);
         rotate2.setPosition(deactivate_angle2);
 
@@ -40,29 +49,33 @@ public class BratOutTake {
 
         telemetry = tele;
     }
-    public boolean isActive, isRotated, feedIsOn;
+    public boolean isActive = false, isRotated = false, feedIsOn = false;
     public void update(){
-        if(feedIsOn) {
-            rotate1.setPosition(feed1);
-            rotate2.setPosition(feed2);
-        } else {
-            if (isActive) {
-                rotate1.setPosition(activate_angle1);
-                rotate2.setPosition(activate_angle2);
 
-                align_backdrop.setPosition(parallel_backdrop);
-            } else {
+        switch (STATE){
+            case FEED:
+                rotate1.setPosition(feed1);
+                rotate2.setPosition(feed2);
+
+                align_backdrop.setPosition(parallel_ground);
+                rotatePixels.setPosition(rotation_to_feed);
+
+                break;
+            case READY_FOR_PIXELS:
                 rotate1.setPosition(deactivate_angle1);
                 rotate2.setPosition(deactivate_angle2);
 
                 align_backdrop.setPosition(parallel_ground);
-            }
-        }
+                rotatePixels.setPosition(rotate_unit * 0);
 
-        if (isRotated) {
-            rotatePixels.setPosition(rotate_unit * 1 + rotation_adaos);
-        } else {
-            rotatePixels.setPosition(rotate_unit * 0 + rotation_adaos_inactive);
+                break;
+            case TO_BACKDROP:
+                rotate1.setPosition(activate_angle1);
+                rotate2.setPosition(activate_angle2);
+
+                align_backdrop.setPosition(parallel_backdrop);
+                rotatePixels.setPosition(rotate_unit * rotate);
+                break;
         }
 
         rotate1.update();
@@ -73,16 +86,15 @@ public class BratOutTake {
     }
 
     public void activate(){
-        isActive = true;
-        feedIsOn = false;
+        STATE = ArmStates.TO_BACKDROP;
     }
     public void deactivate(){
-        isActive = false; isRotated = false;
-        feedIsOn = false;
+        STATE = ArmStates.READY_FOR_PIXELS;
+        rotate = 0;
     }
 
-    public void rotate90(){ isRotated = true; }
-    public void antiRotate90(){ isRotated = false; }
+    public void rotate90(){ rotate = 1;}
+    public void antiRotate90(){ rotate = 0;}
 
 
     public boolean isAtRest(){
@@ -91,9 +103,7 @@ public class BratOutTake {
     }
 
     public void setFeedPos(){
-        feedIsOn = true;
-        isActive = false;
-        isRotated = false;
+        STATE = ArmStates.FEED;
     }
     public boolean getFeedPos(){
         return feedIsOn;

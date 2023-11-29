@@ -21,14 +21,18 @@ public class Grippers {
     private Telemetry telemetry;
     private final RevColorSensorV3 back_sensor, front_sensor;
     private final Servo claw1, claw2;
-    public static double open_claw1 = 0, close_claw1 = 0.8,
-                        open_claw2 = 0.07, close_claw2 = 0.8;
+    public static double open_claw1 = 0.07, close_claw1 = 0.8,
+                        open_claw2 = 0.08, close_claw2 = 0.8;
     public static double trashhold_back = 19, trashhold_front = 19;
     public static boolean ActivateAutomatic = true;
+    public static double backDistance, frontDistance;
+
+    public void update_values(){
+        backDistance = back_sensor.getDistance(DistanceUnit.MM);
+        frontDistance = front_sensor.getDistance(DistanceUnit.MM);
+    }
 
     public void update(){
-        double backDistance = back_sensor.getDistance(DistanceUnit.MM);
-        double frontDistance = front_sensor.getDistance(DistanceUnit.MM);
 
         if(ActivateAutomatic){
             if(backDistance <= trashhold_back){
@@ -100,6 +104,10 @@ public class Grippers {
         STATE.claw1Active = false;
         STATE.claw2Active = false;
         ActivateAutomatic = true;
+    }
+    public void activate(){
+        STATE.claw1Active = true;
+        STATE.claw2Active = true;
     }
     public void ActivateAuto(){ ActivateAutomatic = true; }
     public void dezactivateAuto(){
