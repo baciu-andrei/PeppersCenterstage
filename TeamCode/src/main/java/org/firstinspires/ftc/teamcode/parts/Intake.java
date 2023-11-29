@@ -19,6 +19,7 @@ public class Intake {
 
     public int intake_level = 0;
     public static final int MAX_LEVELS = 5;
+    public static double down_level = 0.7;
     private Telemetry tel;
     public static double step_pos = 0.83/MAX_LEVELS, down_adding = 0;
 
@@ -27,8 +28,6 @@ public class Intake {
         intakeMotor = hm.get(DcMotor.class, "Intake");
         intake_servo = hm.get(Servo.class, "intake_retract");
 
-        intake_servo.setDirection(Servo.Direction.FORWARD);
-
 
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -36,9 +35,9 @@ public class Intake {
         mct.setAchieveableMaxRPMFraction(1.0);
         intakeMotor.setMotorType(mct);
 
-        intake_level = MAX_LEVELS;
+        intake_servo.setDirection(Servo.Direction.REVERSE);
 
-        intake_servo.setPosition(intake_level * step_pos);
+        intake_servo.setPosition(0);
 
         telemetry = tele;
         controls = c;
@@ -57,9 +56,9 @@ public class Intake {
         } else if(!controls.Intake) IntakeOn = false;
 
         if(IntakeOn){
-            intake_servo.setPosition(0 * step_pos + down_adding);
+            intake_servo.setPosition(down_level);
         } else {
-            intake_servo.setPosition(intake_level * step_pos);
+            intake_servo.setPosition(0);
         }
 
         if(IntakeOn) intakeMotor.setPower(0.8);
