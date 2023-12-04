@@ -30,8 +30,7 @@ public class Elevator{
 
 	final private DcMotorEx left, right;
 
-	private static final double CPR = 145.1, diametruSpool = 32;
-	public static final double fullExtend = 950;
+	public static final double fullExtend = 880;
 	public static final double oneStep = fullExtend/11;
 	private int level = 0;
 	private double gotoPos = 0, rightMotorPos = 0, leftMotorPos = 0;
@@ -44,7 +43,7 @@ public class Elevator{
 		left = hardwareMap.get(DcMotorEx.class, "ll");
 		right = hardwareMap.get(DcMotorEx.class, "lr");
 
-		goHardDownUpdater = new MultiTickUpdater(20);
+		goHardDownUpdater = new MultiTickUpdater(5);
 
 		left.setDirection(DcMotorEx.Direction.REVERSE);
 
@@ -107,6 +106,7 @@ public class Elevator{
 				left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 				right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 				goHardDownUpdater.reset();
+				liftDirection = LiftDirection.NORMAL;
 				break;
 			case GO_DOWN:
 				left.setPower(-0.5);

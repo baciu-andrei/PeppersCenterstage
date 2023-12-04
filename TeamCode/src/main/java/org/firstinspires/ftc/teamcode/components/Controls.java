@@ -13,7 +13,8 @@ public class Controls {
                     dropPixel1, dropPilex2,
                     rotatePixels,
                     Intake, reverseIntake,
-                    feedForward, pixelFail;
+                    feedForward, pixelFail, launchPlane;
+    public boolean vibrate1 = false, vibrate2 = false;
 
     private StickyGamepads gamepad1, gamepad2;
 
@@ -34,6 +35,7 @@ public class Controls {
         Intake              = false;
         reverseIntake       = false;
         pixelFail           = false;
+        launchPlane         = false;
     }
 
     public void update(){ // deocamdata hard coded
@@ -77,7 +79,18 @@ public class Controls {
         if(gamepad2.y){
             pixelFail = true;
         }
+        if(gamepad1.y){
+            launchPlane = true;
+        }
 
+        if(vibrate1){
+            gamepad1.gamepad.rumbleBlips(1);
+            vibrate1 = false;
+        }
+        if(vibrate2){
+            gamepad2.gamepad.rumbleBlips(1);
+            vibrate2 = false;
+        }
 
         gamepad1.update();
         gamepad2.update();
@@ -112,7 +125,7 @@ public class Controls {
             reverseIntake = true;
         }
 
-        if(gamepad1.b){
+        if(gamepad2.b){
             rotatePixels = true;
         }
 

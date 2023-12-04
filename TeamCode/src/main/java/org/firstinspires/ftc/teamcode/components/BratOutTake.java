@@ -19,8 +19,8 @@ public class BratOutTake {
     private final CoolServo rotate1, rotate2, align_backdrop, rotatePixels;
 
     public static double parallel_backdrop = 0.2999, parallel_ground = 0;
-    public static double activate_angle1 = 1, activate_angle2 = 1,
-                            deactivate_angle1 = 0.35, deactivate_angle2 = 0.35,
+    public static double activate_angle1 = 0.95, activate_angle2 = 0.95,
+                            deactivate_angle1 = 0.23, deactivate_angle2 = 0.23,
                             feed1 = 0, feed2 = 0;
     public static double rotate_unit = 0.33, rotation_to_feed = 0.3;
     public int rotate = 0;
@@ -33,8 +33,8 @@ public class BratOutTake {
         al_b = hm.get(Servo.class, "angle");
         rotp = hm.get(Servo.class, "pivot");
 
-        rotate1 = new CoolServo(rot1, false, 15, 8, 0);
-        rotate2 = new CoolServo(rot2, true, 15, 8, 0);
+        rotate1 = new CoolServo(rot1, false, 15, 8, deactivate_angle1);
+        rotate2 = new CoolServo(rot2, true, 15, 8, deactivate_angle2);
 
         align_backdrop = new CoolServo(al_b, true,16, 15, 0);
         rotatePixels = new CoolServo(rotp, true, 20, 12,0);
