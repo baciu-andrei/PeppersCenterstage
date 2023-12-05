@@ -20,7 +20,7 @@ public class AutoRightParkingBlue extends LinearOpMode {
     DcMotorEx mbl;
     DcMotorEx mbr;
 
-    public static int milisecondsToParkRightBlue = 6500;
+    public static int milisecondsToParkRightBlue = 10000;
     public static int goFrontMiliseconds = 100;
 
     public static double sadMotor = -0.0415;

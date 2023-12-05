@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.parts;
 
+import static java.lang.Math.abs;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -35,7 +37,7 @@ public class DriveTrain{
         }
 
         void normalize(){
-            double denominator = Math.abs(forward) + Math.abs(right) + Math.abs(turn);
+            double denominator = abs(forward) + abs(right) + abs(turn);
             denominator = Math.max(1, denominator);
 
             forward /= denominator;

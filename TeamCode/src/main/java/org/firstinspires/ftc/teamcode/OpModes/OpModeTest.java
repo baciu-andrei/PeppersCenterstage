@@ -22,14 +22,12 @@ public class OpModeTest extends LinearOpMode {
         FtcDashboard dash = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
         StickyGamepads gp = new StickyGamepads(gamepad2);
-        Grippers grippers = new Grippers(hardwareMap, telemetry);
 
         DcMotorEx dcMotorEx = hardwareMap.get(DcMotorEx.class, "Hang Motor");
         dcMotorEx.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         dcMotorEx.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
-        grippers.dezactivateAuto();
         boolean var = true;
         while(opModeIsActive() && !isStopRequested()){
 //            if(gp.x){

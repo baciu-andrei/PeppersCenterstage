@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 @Config
 @Autonomous(name = "AutoRightParkingRed")
@@ -20,8 +19,7 @@ public class AutoRightParkingRed extends LinearOpMode {
     DcMotorEx mbl;
     DcMotorEx mbr;
 
-    public static int milisecondsToParkRightRed = 3500;
-    public static double sadMotor = 0.065;
+    public static int milisecondsToParkRightRed = 10000;
     boolean crashed = false;
 
     public void runOpMode() throws InterruptedException {
@@ -51,23 +49,13 @@ public class AutoRightParkingRed extends LinearOpMode {
         timer.reset();
         while(opModeIsActive())
         {
-            if(timer.time(TimeUnit.MILLISECONDS)<milisecondsToParkRightRed)
+            if(timer.milliseconds()<milisecondsToParkRightRed)
             {
                 mfl.setPower(0.5);
                 mfr.setPower(-0.5);
-                mbl.setPower((-0.5)-sadMotor);
+                mbl.setPower(-0.5);
                 mbr.setPower(0.5);
             }
-            else
-            {
-                mfl.setPower(0);
-                mfr.setPower(0);
-                mbl.setPower(0);
-                mbr.setPower(0);
-
-            }
-            telemetry.addData("mili", timer.time(TimeUnit.MILLISECONDS));
-            telemetry.update();
         }
     }
 }

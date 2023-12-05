@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.utils.MultiTickUpdater;
 
 @Config
 public class OutTake {
-    private enum STATES_OOUTTAKE {
+    public enum STATES_OOUTTAKE {
         RESET_ELEVATOR,
         SET_FEED_FORWARD,
         SHOUD_RETRACT,
@@ -24,22 +24,22 @@ public class OutTake {
         FEED;
 
         public static int pos = 0;
-        public static int saved_level = 0;
+        public static int saved_level = 7;
     }
-    private STATES_OOUTTAKE STATE;
-    private final Elevator elevator;
-    private final BratOutTake arm;
-    private final Grippers grippers;
-    private Telemetry telemetry;
-    private MultiTickUpdater feedUpdater;
+    public STATES_OOUTTAKE STATE;
+    public final Elevator elevator;
+    public final BratOutTake arm;
+    public final Grippers grippers;
+    private final Telemetry telemetry;
+    private final MultiTickUpdater feedUpdater;
 
-    public int RetractLevel = 4, FeedForwardPos = 5, stallPixels = 2;
+    public int RetractLevel = 5, FeedForwardPos = 4, stallPixels = 2;
 
-    private Controls controls;
+    private final Controls controls;
     public OutTake(HardwareMap hm, Controls c, Telemetry tele){
         elevator = new Elevator(hm, tele);
         arm = new BratOutTake(hm, tele);
-        grippers = new Grippers(hm, tele);
+        grippers = new Grippers(hm, tele, c);
 
         telemetry = tele;
         controls = c;
@@ -47,7 +47,7 @@ public class OutTake {
         grippers.reset();
         feedUpdater = new MultiTickUpdater(10);
     }
-
+    private int closed = 0;
     private void handleControls(){
 
         ///////// ELEVATOR /////////
@@ -73,13 +73,20 @@ public class OutTake {
         if(controls.feedForward){
             STATE = STATES_OOUTTAKE.SET_FEED_FORWARD;
         }
+        if(controls.rotatePixels){
+            if(arm.isRotated)
+                arm.antiRotate90();
+            else arm.rotate90();
+        }
 
         //////// CLAW //////////
         if(controls.dropPixel1){
             grippers.Drop1();
+            closed++;
         }
         if(controls.dropPilex2){
             grippers.Drop2();
+            closed++;
         }
         if(controls.pixelFail){
             grippers.reset();
@@ -100,6 +107,7 @@ public class OutTake {
 
                 STATE = STATES_OOUTTAKE.WAIT_FOR_ELEVATOR_REST;
                 STATES_OOUTTAKE.pos = RetractLevel;
+                closed = 0;
 
                 break;
 
@@ -160,6 +168,11 @@ public class OutTake {
         if(elevator.getLevelNow() > 0.03){
             grippers.dezactivateAuto();
         } else grippers.ActivateAuto();
+
+//        if(closed == 2){
+//            STATE = STATES_OOUTTAKE.SHOUD_RETRACT;
+//        }
+
 
         handleControls();
 

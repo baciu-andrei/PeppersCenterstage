@@ -19,7 +19,7 @@ public class Intake {
 
     public int intake_level = 0;
     public static final int MAX_LEVELS = 5;
-    public static double down_level = 0.7;
+    public static double down_level = 0.9;
     private Telemetry tel;
     public static double step_pos = 0.83/MAX_LEVELS, down_adding = 0;
 
