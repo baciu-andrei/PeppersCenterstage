@@ -1,0 +1,60 @@
+package org.firstinspires.ftc.teamcode.Autonomy;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera2;
+
+@Autonomous
+@Config
+public class CameraDetectorAuto extends LinearOpMode {
+
+    OpenCvCamera camera;
+
+    public void runOpMode() throws InterruptedException {
+        // ------------------ OpenCv initialisation code
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier
+                ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createInternalCamera2(OpenCvInternalCamera2.CameraDirection.BACK, cameraMonitorViewId);
+        ObjectDetectionPipeline detector = new ObjectDetectionPipeline(telemetry);
+        camera.setPipeline(detector);
+        // ------------------ OpenCv code
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+
+            @Override
+            public void onOpened() {
+                camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+                // ------------------ Tzeapa frate
+            }
+
+        });
+        FtcDashboard.getInstance().startCameraStream(camera, 0);
+        waitForStart();
+        while(opModeIsActive() && !isStopRequested()) {
+            switch (detector.getLocation()) {
+                case LEFT:
+                    telemetry.addData("location:" , "left");
+                    break;
+                case MIDDLE:
+                    telemetry.addData("location:" , "middle");
+                    break;
+                case RIGHT:
+                    telemetry.addData("location:" , "right");
+                    break;
+                default:
+                    telemetry.addData("location: " , "nu stiu boss");
+                    break;
+            }
+        }
+        camera.stopStreaming();
+    }
+}
